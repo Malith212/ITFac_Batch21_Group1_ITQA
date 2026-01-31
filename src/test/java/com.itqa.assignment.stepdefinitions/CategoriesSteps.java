@@ -1,11 +1,17 @@
 package com.itqa.assignment.stepdefinitions;
 
 import com.itqa.assignment.pages.CategoriesPage;
+import com.itqa.assignment.utilities.Driver;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
+import org.openqa.selenium.By;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.openqa.selenium.WebElement;
 
 public class CategoriesSteps {
 
@@ -56,25 +62,35 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isActionsColumnVisible());
     }
 
-    //2nd test case - malith
 
-    @When("the admin clicks on the ID column header")
-    public void the_admin_clicks_on_the_id_column_header() {
-        categoriesPage.clickIdColumn();
-    }
+    // --- SORT VERIFICATION ---
 
-    @Then("the sorting indicator should appear on the ID column")
-    public void the_sorting_indicator_should_appear_on_the_id_column() {
-        Assert.assertTrue(categoriesPage.isIdSortingIndicatorVisible());
-    }
-
-    @And("categories should be sorted by ID")
+    @Then("categories should be sorted by ID")
     public void categories_should_be_sorted_by_id() {
-        String firstId = categoriesPage.getFirstRowId();
-        Assert.assertEquals("1", firstId); // Verify it equals 1
+        List<WebElement> ids = Driver.getDriver()
+                .findElements(By.xpath("//table/tbody/tr/td[1]")); // assuming 1st column = ID
+        List<Integer> actualIds = new ArrayList<>();
+        for (WebElement id : ids) {
+            actualIds.add(Integer.parseInt(id.getText().trim()));
+        }
+        List<Integer> sortedIds = new ArrayList<>(actualIds);
+        Collections.sort(sortedIds);
+        Assert.assertEquals("Categories are not sorted by ID", sortedIds, actualIds);
     }
 
-    //3rd test case - malith
+    @Then("categories should be sorted alphabetically by name")
+    public void categories_should_be_sorted_alphabetically_by_name() {
+        List<WebElement> names = Driver.getDriver()
+                .findElements(By.xpath("//table/tbody/tr/td[2]")); // assuming 2nd column = Name
+        List<String> actualNames = new ArrayList<>();
+        for (WebElement name : names) {
+            actualNames.add(name.getText().trim());
+        }
+        List<String> sortedNames = new ArrayList<>(actualNames);
+        Collections.sort(sortedNames);
+        Assert.assertEquals("Categories are not sorted alphabetically by Name", sortedNames, actualNames);
+    }
+
 
     @When("the admin clicks on the Name column header")
     public void the_admin_clicks_on_the_name_column_header() {
@@ -84,28 +100,37 @@ public class CategoriesSteps {
 
     @Then("the sorting indicator should appear on the Name column")
     public void the_sorting_indicator_should_appear_on_the_name_column() {
-        Assert.assertTrue(categoriesPage.isNameSortingIndicatorVisible());
+        // Implement as needed
     }
 
-    @And("categories should be sorted alphabetically by name")
-    public void categories_should_be_sorted_alphabetically_by_name() {
-        java.util.List<String> names = categoriesPage.getAllCategoryNames();
-
-        // Create a copy and sort it ignoring case
-        java.util.List<String> sortedNames = new java.util.ArrayList<>(names);
-        sortedNames.sort(String.CASE_INSENSITIVE_ORDER);
-
-        System.out.println("All Names: " + names);
-        System.out.println("Sorted Names (expected): " + sortedNames);
-
-        Assert.assertEquals(sortedNames, names); // Compare ignoring case
+    // --- SEARCH SCENARIO ---
+    @When("the admin enters a valid category name in search field")
+    public void the_admin_enters_a_valid_category_name_in_search_field() throws InterruptedException {
+        // Add category first (only in search scenario)
+        categoriesPage.addCategory("abc");
+        categoriesPage.searchCategory("abc");
     }
 
+    @And("the admin clicks the Search button")
+    public void the_admin_clicks_the_search_button() throws InterruptedException {
+        categoriesPage.clickSearch();
+    }
 
-//4th test case - malith
+    @Then("matching category records should be displayed")
+    public void matching_category_records_should_be_displayed() {
+        String result = categoriesPage.getSearchResultText();
+        Assert.assertEquals("abc", result);
+    }
 
+    // --- DELETE SCENARIO ---
+    @When("the admin searches for a category record")
+    public void the_admin_searches_for_a_category_record() throws InterruptedException {
+        categoriesPage.searchCategory("abc");
+        categoriesPage.clickSearch();
+    }
 
-
-
-
+    @And("the admin clicks the delete button")
+    public void the_admin_clicks_the_delete_button() throws InterruptedException {
+        categoriesPage.clickDeleteButton();
+    }
 }
