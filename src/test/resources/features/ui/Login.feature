@@ -1,3 +1,4 @@
+@ui
 Feature: Login Functionality
 
   Scenario: Successful Login as Admin

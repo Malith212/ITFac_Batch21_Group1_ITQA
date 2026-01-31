@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
                 "html:target/cucumber-reports.html",
                 "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm" // Allure Integration
         },
-        dryRun = true
+        dryRun = false
 )
 
 public class TestRunner {
