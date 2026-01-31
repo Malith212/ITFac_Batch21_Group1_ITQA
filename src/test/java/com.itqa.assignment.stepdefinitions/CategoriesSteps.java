@@ -1,23 +1,22 @@
 package com.itqa.assignment.stepdefinitions;
 
 import com.itqa.assignment.pages.CategoriesPage;
-import com.itqa.assignment.utilities.Driver;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import org.openqa.selenium.By;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import org.openqa.selenium.WebElement;
 
 public class CategoriesSteps {
 
     CategoriesPage categoriesPage = new CategoriesPage();
 
-    // --- BASIC NAVIGATION ---
+    // ------------------------
+    // --- NAVIGATION / VISIBILITY CHECKS ---
+    // ------------------------
     @Given("the admin is on the Categories page")
     public void the_admin_is_on_the_categories_page() {
         categoriesPage.visit();
@@ -62,9 +61,9 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isActionsColumnVisible());
     }
 
-    //Sorting Scenario
-
-    // --- SORTING SCENARIO ---
+    // ------------------------
+    // --- SORTING BY ID ---
+    // ------------------------
     @When("the admin clicks on the ID column header")
     public void the_admin_clicks_on_the_id_column_header() {
         categoriesPage.clickIdColumn();
@@ -75,14 +74,37 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isIdSortIndicatorVisible());
     }
 
-
     @And("categories should be sorted by ID")
     public void categories_should_be_sorted_by_id() {
-        // Verify the first row has ID 1
         Assert.assertEquals("1", categoriesPage.getFirstRowId());
     }
 
+    // ------------------------
+    // --- SORTING BY NAME ---
+    // ------------------------
+    @When("the admin clicks on the Name column header")
+    public void the_admin_clicks_on_the_name_column_header() {
+        categoriesPage.clickNameColumn(); // Click once (ascending)
+        categoriesPage.clickNameColumn(); // Click twice (descending if needed)
+    }
 
+    @Then("the sorting indicator should appear on the Name column")
+    public void the_sorting_indicator_should_appear_on_the_name_column() {
+        Assert.assertTrue(categoriesPage.isNameSortIndicatorVisible());
+    }
+
+    @And("categories should be sorted alphabetically by name")
+    public void categories_should_be_sorted_alphabetically_by_name() {
+        List<String> names = categoriesPage.getAllCategoryNames();
+
+        List<String> sortedNames = new ArrayList<>(names);
+        sortedNames.sort(String.CASE_INSENSITIVE_ORDER);
+
+        System.out.println("Current Names: " + names);
+        System.out.println("Expected Sorted Names: " + sortedNames);
+
+        Assert.assertEquals(sortedNames, names);
+    }
 
     // --- SEARCH SCENARIO ---
     @When("the admin enters a valid category name in search field")
