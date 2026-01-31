@@ -6,6 +6,10 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 import com.itqa.assignment.pages.LoginPage;
 import com.itqa.assignment.utilities.Driver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class LoginSteps {
     // Instantiate the page class to access its methods
@@ -31,8 +35,10 @@ public class LoginSteps {
     // --- 3. ASSERTIONS ---
     @Then("the user should be redirected to the Dashboard")
     public void the_user_should_be_redirected_to_the_dashboard() {
-        String currentUrl = Driver.getDriver().getCurrentUrl();
-        Assert.assertTrue(currentUrl.contains("/dashboard"));
+        WebDriverWait wait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
+        // Wait until the URL actually contains 'dashboard'
+        wait.until(ExpectedConditions.urlContains("dashboard"));
+        Assert.assertTrue(Driver.getDriver().getCurrentUrl().contains("dashboard"));
     }
 
     @Then("the user should see an error message {string}")
