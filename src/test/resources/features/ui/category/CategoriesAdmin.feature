@@ -23,15 +23,15 @@ Feature: Category Management - Admin
     Then the sorting indicator should appear on the Name column
     And categories should be sorted alphabetically by name
 
-#  Scenario: Delete Category
-#    And the admin is on the Categories page
-#    When the admin searches for a category record
-#    And the admin clicks the delete button
+  Scenario: Search category by valid name
+    And the admin is on the Categories page
+    When the admin enters a valid category name in search field
+    And the admin clicks the Search button
+    Then matching category records should be displayed
+
+  Scenario: Delete Category
+    And the admin is on the Categories page
+    When the admin searches for a category record
+    And the admin clicks the delete button
 #    Then the category should be deleted successfully
 #    And success message should be displayed
-#
-#  Scenario: Search category by valid name
-#    And the admin is on the Categories page
-#    When the admin enters a valid category name in search field
-#    And the admin clicks the Search button
-#    Then matching category records should be displayed

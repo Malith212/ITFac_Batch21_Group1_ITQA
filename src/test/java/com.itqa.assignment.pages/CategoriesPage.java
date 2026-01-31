@@ -1,10 +1,7 @@
 package com.itqa.assignment.pages;
+
 import com.itqa.assignment.utilities.Driver;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 public class CategoriesPage {
 
@@ -18,15 +15,16 @@ public class CategoriesPage {
     private final By searchBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/button");
     private final By resetBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/a[1]");
     private final By addCategoryBtn = By.xpath("//a[@href='/ui/categories/add']");
+    private final By categoryNameInput = By.xpath("//input");
+    private final By saveCategoryBtn = By.xpath("//button[@type='submit']");
+    private final By searchResultRecord = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
+    private final By deleteBtn = By.xpath("//button[@title='Delete']");
 
     // --- Table Columns ---
     private final By idColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[1]");
     private final By nameColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[2]");
     private final By parentColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[3]");
     private final By actionsColumn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[4]");
-
-    // --- Table Rows ---
-    private final By firstRecordId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[2]/td[1]");
 
     // --- Navigation ---
     public void visit() {
@@ -78,69 +76,47 @@ public class CategoriesPage {
         return Driver.getDriver().findElement(actionsColumn).isDisplayed();
     }
 
-    //2nd test case - malith
-
-    // --- Actions ---
+    // --- Sorting Columns ---
     public void clickIdColumn() {
         Driver.getDriver().findElement(idColumn).click();
     }
 
-    // --- Sorting Indicator ---
-    private final By idSortingIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[1]/a/span");
-
-    public boolean isIdSortingIndicatorVisible() {
-        try {
-            // Wait 2 seconds to let the indicator appear
-            Thread.sleep(2000);
-            return Driver.getDriver().findElement(idSortingIndicator).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // --- First Record ID ---
-    private final By firstRowId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]/td[1]");
-
-    public String getFirstRowId() {
-        String id = Driver.getDriver().findElement(firstRowId).getText();
-        System.out.println("First row ID: " + id); // Print to console
-        return id;
-    }
-
-    // 3rd test cases - malith
-
-    // --- Actions ---
     public void clickNameColumn() {
         Driver.getDriver().findElement(nameColumn).click();
     }
 
-    // --- Name Column Sorting Indicator ---
-    private final By nameSortingIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[2]/a/span");
-
-    public boolean isNameSortingIndicatorVisible() {
-        try {
-            // Wait 2 seconds for the indicator to appear
-            Thread.sleep(2000);
-            return Driver.getDriver().findElement(nameSortingIndicator).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
+    // --- Add Category (used only in search scenario) ---
+    public void addCategory(String categoryName) throws InterruptedException {
+        Thread.sleep(2000);
+        Driver.getDriver().findElement(addCategoryBtn).click();
+        Thread.sleep(2000);
+        Driver.getDriver().findElement(categoryNameInput).sendKeys(categoryName);
+        Thread.sleep(2000);
+        Driver.getDriver().findElement(saveCategoryBtn).click();
+        Thread.sleep(2000);
     }
 
-    private final By allNames = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
-
-    public java.util.List<String> getAllCategoryNames() {
-        java.util.List<String> names = new java.util.ArrayList<>();
-        for (org.openqa.selenium.WebElement element : Driver.getDriver().findElements(allNames)) {
-            names.add(element.getText());
-        }
-        System.out.println("All Names: " + names); // Print all names
-        return names;
+    // --- Search ---
+    public void searchCategory(String categoryName) throws InterruptedException {
+        Thread.sleep(2000);
+        Driver.getDriver().findElement(searchInput).clear();
+        Driver.getDriver().findElement(searchInput).sendKeys(categoryName);
     }
 
+    public void clickSearch() throws InterruptedException {
+        Thread.sleep(1000);
+        Driver.getDriver().findElement(searchBtn).click();
+        Thread.sleep(2000);
+    }
 
-//4th test case - malith
+    public String getSearchResultText() {
+        return Driver.getDriver().findElement(searchResultRecord).getText();
+    }
 
-
-
+    // --- Delete Category ---
+    public void clickDeleteButton() throws InterruptedException {
+        Driver.getDriver().navigate().refresh();
+        Thread.sleep(5000);
+        Driver.getDriver().findElement(deleteBtn).click();
+    }
 }
