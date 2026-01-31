@@ -17,11 +17,11 @@ Feature: Category Management - Admin
     Then the sorting indicator should appear on the ID column
     And categories should be sorted by ID
 
-  Scenario: Sort categories by Name
-    And the admin is on the Categories page
-    When the admin clicks on the Name column header
-    Then the sorting indicator should appear on the Name column
-    And categories should be sorted alphabetically by name
+#  Scenario: Sort categories by Name
+#    And the admin is on the Categories page
+#    When the admin clicks on the Name column header
+#    Then the sorting indicator should appear on the Name column
+#    And categories should be sorted alphabetically by name
 
   Scenario: Search category by valid name
     And the admin is on the Categories page

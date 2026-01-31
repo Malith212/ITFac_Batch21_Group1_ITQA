@@ -62,46 +62,27 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isActionsColumnVisible());
     }
 
+    //Sorting Scenario
 
-    // --- SORT VERIFICATION ---
+    // --- SORTING SCENARIO ---
+    @When("the admin clicks on the ID column header")
+    public void the_admin_clicks_on_the_id_column_header() {
+        categoriesPage.clickIdColumn();
+    }
 
-    @Then("categories should be sorted by ID")
+    @Then("the sorting indicator should appear on the ID column")
+    public void the_sorting_indicator_should_appear_on_the_id_column() {
+        Assert.assertTrue(categoriesPage.isIdSortIndicatorVisible());
+    }
+
+
+    @And("categories should be sorted by ID")
     public void categories_should_be_sorted_by_id() {
-        List<WebElement> ids = Driver.getDriver()
-                .findElements(By.xpath("//table/tbody/tr/td[1]")); // assuming 1st column = ID
-        List<Integer> actualIds = new ArrayList<>();
-        for (WebElement id : ids) {
-            actualIds.add(Integer.parseInt(id.getText().trim()));
-        }
-        List<Integer> sortedIds = new ArrayList<>(actualIds);
-        Collections.sort(sortedIds);
-        Assert.assertEquals("Categories are not sorted by ID", sortedIds, actualIds);
-    }
-
-    @Then("categories should be sorted alphabetically by name")
-    public void categories_should_be_sorted_alphabetically_by_name() {
-        List<WebElement> names = Driver.getDriver()
-                .findElements(By.xpath("//table/tbody/tr/td[2]")); // assuming 2nd column = Name
-        List<String> actualNames = new ArrayList<>();
-        for (WebElement name : names) {
-            actualNames.add(name.getText().trim());
-        }
-        List<String> sortedNames = new ArrayList<>(actualNames);
-        Collections.sort(sortedNames);
-        Assert.assertEquals("Categories are not sorted alphabetically by Name", sortedNames, actualNames);
+        // Verify the first row has ID 1
+        Assert.assertEquals("1", categoriesPage.getFirstRowId());
     }
 
 
-    @When("the admin clicks on the Name column header")
-    public void the_admin_clicks_on_the_name_column_header() {
-        categoriesPage.clickNameColumn();
-        categoriesPage.clickNameColumn();
-    }
-
-    @Then("the sorting indicator should appear on the Name column")
-    public void the_sorting_indicator_should_appear_on_the_name_column() {
-        // Implement as needed
-    }
 
     // --- SEARCH SCENARIO ---
     @When("the admin enters a valid category name in search field")

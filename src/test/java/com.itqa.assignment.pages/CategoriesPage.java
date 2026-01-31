@@ -2,8 +2,15 @@ package com.itqa.assignment.pages;
 
 import com.itqa.assignment.utilities.Driver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class CategoriesPage {
+
+    private final WebDriverWait wait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
 
     // --- Menu ---
     private final By categoriesMenuItem = By.xpath("/html/body/div[1]/div/div[1]/a[2]");
@@ -28,7 +35,7 @@ public class CategoriesPage {
 
     // --- Navigation ---
     public void visit() {
-        Driver.getDriver().findElement(categoriesMenuItem).click();
+        wait.until(ExpectedConditions.elementToBeClickable(categoriesMenuItem)).click();
     }
 
     // --- Validations ---
@@ -37,86 +44,94 @@ public class CategoriesPage {
     }
 
     public boolean isHeaderVisible() {
-        return Driver.getDriver().findElement(header).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(header)).isDisplayed();
     }
 
     public boolean isSearchInputVisible() {
-        return Driver.getDriver().findElement(searchInput).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput)).isDisplayed();
     }
 
     public boolean isCategoryDropdownVisible() {
-        return Driver.getDriver().findElement(categoryDropdown).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(categoryDropdown)).isDisplayed();
     }
 
     public boolean isSearchButtonVisible() {
-        return Driver.getDriver().findElement(searchBtn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(searchBtn)).isDisplayed();
     }
 
     public boolean isResetButtonVisible() {
-        return Driver.getDriver().findElement(resetBtn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(resetBtn)).isDisplayed();
     }
 
     public boolean isAddCategoryButtonVisible() {
-        return Driver.getDriver().findElement(addCategoryBtn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(addCategoryBtn)).isDisplayed();
     }
 
     public boolean isIdColumnVisible() {
-        return Driver.getDriver().findElement(idColumn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(idColumn)).isDisplayed();
     }
 
     public boolean isNameColumnVisible() {
-        return Driver.getDriver().findElement(nameColumn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(nameColumn)).isDisplayed();
     }
 
     public boolean isParentColumnVisible() {
-        return Driver.getDriver().findElement(parentColumn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(parentColumn)).isDisplayed();
     }
 
     public boolean isActionsColumnVisible() {
-        return Driver.getDriver().findElement(actionsColumn).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(actionsColumn)).isDisplayed();
     }
 
     // --- Sorting Columns ---
+
+    // --- Sorting Columns ---
     public void clickIdColumn() {
-        Driver.getDriver().findElement(idColumn).click();
+        wait.until(ExpectedConditions.elementToBeClickable(idColumn)).click();
     }
 
-    public void clickNameColumn() {
-        Driver.getDriver().findElement(nameColumn).click();
+    // Locator for the sorting indicator on ID column
+    private final By idSortIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[1]/a/span");
+
+    // Check if the sorting indicator is visible
+    public boolean isIdSortIndicatorVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(idSortIndicator)).isDisplayed();
     }
+
+    // Locator for the first row ID
+    private final By firstRowId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]/td[1]");
+
+    // Get the ID of the first row
+    public String getFirstRowId() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(firstRowId)).getText();
+    }
+
 
     // --- Add Category (used only in search scenario) ---
-    public void addCategory(String categoryName) throws InterruptedException {
-        Thread.sleep(2000);
-        Driver.getDriver().findElement(addCategoryBtn).click();
-        Thread.sleep(2000);
-        Driver.getDriver().findElement(categoryNameInput).sendKeys(categoryName);
-        Thread.sleep(2000);
-        Driver.getDriver().findElement(saveCategoryBtn).click();
-        Thread.sleep(2000);
+    public void addCategory(String categoryName) {
+        wait.until(ExpectedConditions.elementToBeClickable(addCategoryBtn)).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(categoryNameInput)).sendKeys(categoryName);
+        wait.until(ExpectedConditions.elementToBeClickable(saveCategoryBtn)).click();
     }
 
     // --- Search ---
-    public void searchCategory(String categoryName) throws InterruptedException {
-        Thread.sleep(2000);
-        Driver.getDriver().findElement(searchInput).clear();
-        Driver.getDriver().findElement(searchInput).sendKeys(categoryName);
+    public void searchCategory(String categoryName) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
+        input.clear();
+        input.sendKeys(categoryName);
     }
 
-    public void clickSearch() throws InterruptedException {
-        Thread.sleep(1000);
-        Driver.getDriver().findElement(searchBtn).click();
-        Thread.sleep(2000);
+    public void clickSearch() {
+        wait.until(ExpectedConditions.elementToBeClickable(searchBtn)).click();
     }
 
     public String getSearchResultText() {
-        return Driver.getDriver().findElement(searchResultRecord).getText();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultRecord)).getText();
     }
 
     // --- Delete Category ---
-    public void clickDeleteButton() throws InterruptedException {
+    public void clickDeleteButton() {
         Driver.getDriver().navigate().refresh();
-        Thread.sleep(5000);
-        Driver.getDriver().findElement(deleteBtn).click();
+        wait.until(ExpectedConditions.elementToBeClickable(deleteBtn)).click();
     }
 }
