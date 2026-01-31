@@ -3,6 +3,6 @@ Feature: Sales Management Functionality
 
   Scenario: Verify that admin can navigate to sell plant page
     Given the admin is logged into the system
-    And the admin is on the Sales page
+    And the user navigates to the "sales" page via sidebar
     When the admin clicks on the "Sell Plant" button in the Sales page
-    Then the admin should be redirected to the page with url "/sales/new"
+    Then the URL should contain "/sales/new"
