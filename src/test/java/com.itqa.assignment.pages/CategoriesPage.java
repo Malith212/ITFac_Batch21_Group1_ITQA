@@ -12,21 +12,31 @@ import java.util.List;
 
 public class CategoriesPage {
 
-    // --- WebDriver Wait ---
+    // ------------------------
+    // --- WEBDRIVER WAIT ---
+    // ------------------------
     private final WebDriverWait wait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
 
-    // --- MENU ---
+    // ------------------------
+    // --- MENU LOCATORS ---
+    // ------------------------
     private final By categoriesMenuItem = By.xpath("/html/body/div[1]/div/div[1]/a[2]"); // Admin left menu "Categories"
 
-    // --- PAGE ELEMENTS ---
+    // ------------------------
+    // --- PAGE ELEMENTS LOCATORS ---
+    // ------------------------
     private final By header = By.xpath("//h3[@class='mb-4']");
     private final By searchInput = By.xpath("//input[@type='text']");
     private final By categoryDropdown = By.xpath("//select[@class='form-select']");
     private final By searchBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/button");
     private final By resetBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/a[1]");
     private final By addCategoryBtn = By.xpath("//a[@href='/ui/categories/add']");
+    private final By categoryNameInput = By.xpath("//input");
+    private final By saveCategoryBtn = By.xpath("//button[@type='submit']");
 
-    // --- TABLE COLUMNS ---
+    // ------------------------
+    // --- TABLE LOCATORS ---
+    // ------------------------
     private final By idColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[1]");
     private final By nameColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[2]");
     private final By parentColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[3]");
@@ -39,16 +49,19 @@ public class CategoriesPage {
     // --- TABLE DATA ---
     private final By allNames = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
     private final By firstRowId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]/td[1]");
+    private final By searchResultRecord = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
+    private final By deleteBtn = By.xpath("//button[@title='Delete']");
 
     // ------------------------
-    // --- NAVIGATION ---
+    // --- NAVIGATION METHODS ---
     // ------------------------
+    /** Navigate to Categories page via menu */
     public void visit() {
         wait.until(ExpectedConditions.elementToBeClickable(categoriesMenuItem)).click();
     }
 
     // ------------------------
-    // --- ELEMENT VISIBILITY ---
+    // --- VISIBILITY CHECKS ---
     // ------------------------
     public boolean isCategoriesPageDisplayed() {
         return Driver.getDriver().getCurrentUrl().contains("categories");
@@ -95,23 +108,27 @@ public class CategoriesPage {
     }
 
     // ------------------------
-    // --- SORTING ---
+    // --- SORTING METHODS ---
     // ------------------------
+    /** Click on ID column to sort */
     public void clickIdColumn() {
         wait.until(ExpectedConditions.elementToBeClickable(idColumn)).click();
     }
 
+    /** Check if ID sort indicator is visible */
     public boolean isIdSortIndicatorVisible() {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(idSortIndicator)).isDisplayed();
     }
 
+    /** Click on Name column to sort */
     public void clickNameColumn() {
         wait.until(ExpectedConditions.elementToBeClickable(nameColumn)).click();
     }
 
+    /** Check if Name sort indicator is visible */
     public boolean isNameSortIndicatorVisible() {
         try {
-            Thread.sleep(2000); // small wait for sorting indicator
+            Thread.sleep(2000); // Wait for sorting animation
             return Driver.getDriver().findElement(nameSortIndicator).isDisplayed();
         } catch (Exception e) {
             return false;
@@ -119,8 +136,9 @@ public class CategoriesPage {
     }
 
     // ------------------------
-    // --- TABLE DATA FETCH ---
+    // --- TABLE DATA METHODS ---
     // ------------------------
+    /** Get all category names from the table */
     public List<String> getAllCategoryNames() {
         List<String> names = new ArrayList<>();
         for (WebElement element : Driver.getDriver().findElements(allNames)) {
@@ -130,40 +148,44 @@ public class CategoriesPage {
         return names;
     }
 
+    /** Get ID of the first row */
     public String getFirstRowId() {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(firstRowId)).getText();
     }
 
-    // --- Add Category (used only in search scenario) ---
+    // ------------------------
+    // --- CATEGORY ACTIONS ---
+    // ------------------------
+    /** Add a category */
     public void addCategory(String categoryName) {
         wait.until(ExpectedConditions.elementToBeClickable(addCategoryBtn)).click();
         wait.until(ExpectedConditions.visibilityOfElementLocated(categoryNameInput)).sendKeys(categoryName);
         wait.until(ExpectedConditions.elementToBeClickable(saveCategoryBtn)).click();
     }
 
-    private final By categoryNameInput = By.xpath("//input");
-    private final By saveCategoryBtn = By.xpath("//button[@type='submit']");
-    private final By searchResultRecord = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
-    private final By deleteBtn = By.xpath("//button[@title='Delete']");
-
-    // --- Search ---
+    /** Search for a category */
     public void searchCategory(String categoryName) {
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
         input.clear();
         input.sendKeys(categoryName);
     }
 
+    /** Click Search button */
     public void clickSearch() {
         wait.until(ExpectedConditions.elementToBeClickable(searchBtn)).click();
     }
 
+    // --- Get search result text safely ---
     public String getSearchResultText() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultRecord)).getText();
+        // Explicit wait for the search result element to be visible
+        WebElement result = wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultRecord));
+        return result.getText();
     }
 
-    // --- Delete Category ---
+
+    /** Delete a category */
     public void clickDeleteButton() {
-        Driver.getDriver().navigate().refresh();
+        Driver.getDriver().navigate().refresh(); // Refresh before deleting
         wait.until(ExpectedConditions.elementToBeClickable(deleteBtn)).click();
     }
 }
