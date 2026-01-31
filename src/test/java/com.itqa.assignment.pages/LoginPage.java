@@ -1,43 +1,46 @@
 package com.itqa.assignment.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import com.itqa.assignment.utilities.Driver;
 import com.itqa.assignment.utilities.ConfigReader;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class LoginPage {
-    // 1. Define Locators as 'By' objects
+    private final WebDriver driver = Driver.getDriver();
+    private final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // Explicit wait
+
     private final By usernameInput = By.name("username");
     private final By passwordInput = By.name("password");
     private final By loginBtn = By.cssSelector("button[type='submit']");
     private final By inputError = By.className("invalid-feedback");
     private final By globalError = By.cssSelector(".alert.alert-danger");
 
-    // 2. Navigation Method
     public void visit() {
-        Driver.getDriver().get(ConfigReader.getProperty("ui.url") + "/login");
+        driver.get(ConfigReader.getProperty("ui.url") + "/login");
     }
 
-    // 3. Action Method (Direct interaction)
     public void submitLogin(String username, String password) {
-        // Find and interact directly using the Driver utility
-        Driver.getDriver().findElement(usernameInput).clear();
-        Driver.getDriver().findElement(usernameInput).sendKeys(username);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(usernameInput)).clear();
+        driver.findElement(usernameInput).sendKeys(username);
 
-        Driver.getDriver().findElement(passwordInput).clear();
-        Driver.getDriver().findElement(passwordInput).sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(passwordInput)).clear();
+        driver.findElement(passwordInput).sendKeys(password);
 
-        Driver.getDriver().findElement(loginBtn).click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginBtn)).click();
     }
 
-    // 4. Verification Methods
     public String getGlobalErrorMessage() {
-        return Driver.getDriver().findElement(globalError).getText();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(globalError)).getText();
     }
 
     public boolean isInputErrorDisplayed() {
-        return Driver.getDriver().findElement(inputError).isDisplayed();
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(inputError)).isDisplayed();
     }
 }
