@@ -42,7 +42,7 @@ public class LoginSteps {
         NavigationHelper.waitForUrlContains("dashboard");
     }
 
-    @Given("logged in as a Standard User")
+    @Given("the user is logged into the system")
     public void logged_in_as_a_user() {
         NavigationHelper.navigateTo("login");
         loginPage.submitLogin("testuser", "test123");
