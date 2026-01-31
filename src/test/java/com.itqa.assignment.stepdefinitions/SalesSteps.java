@@ -21,7 +21,7 @@ public class SalesSteps {
     }
 
     // --- 2. BUTTON INTERACTIONS ---
-    @When("the admin clicks on the {string} button")
+    @When("the admin clicks on the {string} button in the Sales page")
     public void the_admin_clicks_on_the_button(String buttonName) {
         if (buttonName.equals("Sell Plant")) {
             salesPage.clickSellPlantBtn();
@@ -29,10 +29,4 @@ public class SalesSteps {
     }
 
     // --- 3. ASSERTIONS ---
-    @Then("the admin should be redirected to the {string} page")
-    public void the_admin_should_be_redirected_to_the_page(String uriSegment) {
-        WebDriverWait wait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.urlContains(uriSegment));
-        Assert.assertTrue(Driver.getDriver().getCurrentUrl().contains(uriSegment));
-    }
 }
