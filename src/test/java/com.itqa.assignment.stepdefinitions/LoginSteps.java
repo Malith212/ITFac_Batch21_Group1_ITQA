@@ -48,7 +48,7 @@ public class LoginSteps {
     }
 
     // --- 4. REUSABLE BACKGROUND STEPS ---
-    @Given("logged in as an Admin")
+    @Given("the admin is logged into the system")
     public void logged_in_as_an_admin() {
         loginPage.visit();
         loginPage.submitLogin("admin", "admin123");
