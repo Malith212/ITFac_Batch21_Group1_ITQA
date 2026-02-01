@@ -25,6 +25,6 @@ Feature: Category Management - Standard User
   Scenario: Search category with invalid name
     Given the user is logged into the system
     And the user is on the Categories page
-#    When the user enters an invalid category name in search field
-#    And the user clicks the Search button
-#    Then "No category found" message should be displayed
+    When the user enters an invalid category name in search field
+    And the user clicks the Search button
+    Then "No category found" message should be displayed
