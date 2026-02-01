@@ -207,6 +207,18 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isAccessDeniedPageDisplayed());
     }
 
+    @When("the user enters an invalid category name in search field")
+    public void the_user_enters_an_invalid_category_name_in_search_field() {
+
+        categoriesPage.enterInvalidCategoryName("testnoki");
+    }
+
+    @Then("{string} message should be displayed")
+    public void message_should_be_displayed(String message) {
+
+        Assert.assertTrue(categoriesPage.isNoCategoryMessageDisplayed(message));
+    }
+
 
 
 }

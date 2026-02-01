@@ -370,6 +370,37 @@ public class CategoriesPage {
         }
     }
 
+    public void enterInvalidCategoryName(String categoryName) {
+
+        WebElement inputField = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchInput)
+        );
+
+        inputField.clear();
+        inputField.sendKeys(categoryName);
+
+        System.out.println("Entered invalid category name: " + categoryName);
+    }
+
+    private final By noCategoryMessage = By.xpath("//td[@class='text-center text-muted py-4']");
+
+    public boolean isNoCategoryMessageDisplayed(String expectedMessage) {
+
+        try {
+            WebElement messageElement = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(noCategoryMessage)
+            );
+
+            String actualMessage = messageElement.getText().trim();
+
+            System.out.println("No Category Message: " + actualMessage);
+
+            return actualMessage.equals(expectedMessage);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 
 
