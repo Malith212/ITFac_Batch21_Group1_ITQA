@@ -151,5 +151,33 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.getSuccessMessageElement().isDisplayed());
     }
 
+    //---User Test cases---
+
+    @Given("the user is on the Categories page")
+    public void the_user_is_on_the_categories_page() {
+        categoriesPage.visit();
+    }
+
+    @When("the user selects a parent category from dropdown")
+    public void the_user_selects_a_parent_category_from_dropdown() {
+        // Print all options first
+        List<String> options = categoriesPage.getParentDropdownOptions();
+
+        // Select "category 1"
+        categoriesPage.selectParentCategory("category 1");
+    }
+
+    @And("the user clicks the Search button")
+    public void the_user_clicks_the_search_button() {
+        categoriesPage.clickSearchWithWaits();
+    }
+
+    @Then("filtered categories should be displayed")
+    public void filtered_categories_should_be_displayed() {
+
+        boolean isDisplayed = categoriesPage.isFilteredCategoryDisplayed("category 1");
+
+        Assert.assertTrue(isDisplayed);
+    }
 
 }
