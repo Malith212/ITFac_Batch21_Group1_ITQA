@@ -21,10 +21,10 @@ Feature: Category Management - Standard User
     Given the user is logged into the system
     When the user navigates to "/ui/categories/add"
     Then the user should be redirected to Access Denied page
-#
-#  Scenario: Search category with invalid name
-#    Given the user is logged into the system
-#    And the user is on the Categories page
+
+  Scenario: Search category with invalid name
+    Given the user is logged into the system
+    And the user is on the Categories page
 #    When the user enters an invalid category name in search field
 #    And the user clicks the Search button
 #    Then "No category found" message should be displayed

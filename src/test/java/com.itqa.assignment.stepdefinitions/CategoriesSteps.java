@@ -5,6 +5,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import com.itqa.assignment.utilities.Driver;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -191,5 +192,21 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isEditActionHiddenOrDisabled());
         Assert.assertTrue(categoriesPage.isDeleteActionHiddenOrDisabled());
     }
+
+    @When("the user navigates to {string}")
+    public void the_user_navigates_to(String path) {
+
+        String baseUrl = "http://localhost:8080"; // change if needed
+
+        Driver.getDriver().navigate().to(baseUrl + path);
+    }
+
+
+    @Then("the user should be redirected to Access Denied page")
+    public void the_user_should_be_redirected_to_access_denied_page() {
+        Assert.assertTrue(categoriesPage.isAccessDeniedPageDisplayed());
+    }
+
+
 
 }
