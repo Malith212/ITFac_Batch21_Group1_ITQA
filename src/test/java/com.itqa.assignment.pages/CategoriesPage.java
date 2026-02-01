@@ -342,5 +342,35 @@ public class CategoriesPage {
         return (!delete.isDisplayed() || !delete.isEnabled());
     }
 
+    public void navigateToAddCategoryPage() {
+        Driver.getDriver().navigate().to(
+                Driver.getDriver().getCurrentUrl().split("/ui")[0] + "/ui/categories/add"
+        );
+    }
+
+    // Access Denied header
+    private final By accessDeniedHeader = By.cssSelector("h2");
+
+
+    public boolean isAccessDeniedPageDisplayed() {
+
+        try {
+            WebElement header = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(accessDeniedHeader)
+            );
+
+            String actualText = header.getText().trim();
+
+            System.out.println("Access Denied Page Text: " + actualText);
+
+            return actualText.equals("403 - Access Denied");
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+
 
 }
