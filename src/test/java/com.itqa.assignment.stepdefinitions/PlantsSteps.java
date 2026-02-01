@@ -77,4 +77,22 @@ public class PlantsSteps {
         Assert.assertTrue("Price field should be empty",
                 plantPage.isPriceFieldEmpty());
     }
+
+    // Quantity field step definitions
+    @When("the admin enters a negative number in the Quantity field")
+    public void the_admin_enters_a_negative_number_in_the_quantity_field() {
+        plantPage.enterNegativeQuantity();
+    }
+
+    @Then("the error message {string} should be displayed below the Quantity field")
+    public void the_error_message_should_be_displayed_below_the_quantity_field(String expectedMessage) {
+        // Verify error message is displayed
+        Assert.assertTrue("Quantity error message should be displayed",
+                plantPage.isQuantityErrorDisplayed());
+
+        // Verify error message text
+        String actualMessage = plantPage.getQuantityErrorMessage();
+        Assert.assertTrue("Error message should contain: " + expectedMessage + ", but was: " + actualMessage,
+                actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()));
+    }
 }

@@ -14,9 +14,11 @@ public class PlantsPage {
     private final By addPlantBtn = By.cssSelector("a.btn-primary");
     private final By plantNameField = By.id("name");
     private final By priceField = By.id("price");
+    private final By quantityField = By.id("quantity");
     private final By saveBtn = By.cssSelector("button.btn-primary");
     private final By plantNameErrorMessage = By.cssSelector("#name + .text-danger");
     private final By priceErrorMessage = By.cssSelector("#price + .text-danger");
+    private final By quantityErrorMessage = By.cssSelector("#quantity + .text-danger");
 
     private WebDriverWait getWait() {
         return new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
@@ -112,5 +114,36 @@ public class PlantsPage {
         WebElement priceInput = Driver.getDriver().findElement(priceField);
         String value = priceInput.getAttribute("value");
         return value == null || value.trim().isEmpty();
+    }
+
+    // Quantity field methods
+    public void enterNegativeQuantity() {
+        WebElement quantityInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
+        quantityInput.clear();
+        quantityInput.sendKeys("-1");
+    }
+
+    public void enterQuantity(String quantity) {
+        WebElement quantityInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
+        quantityInput.clear();
+        quantityInput.sendKeys(quantity);
+    }
+
+    public boolean isQuantityErrorDisplayed() {
+        try {
+            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
+            return errorElement.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getQuantityErrorMessage() {
+        try {
+            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
+            return errorElement.getText();
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
