@@ -180,4 +180,16 @@ public class CategoriesSteps {
         Assert.assertTrue(isDisplayed);
     }
 
+    @Then("the Add Category button should not be visible")
+    public void the_add_category_button_should_not_be_visible() {
+        Assert.assertTrue(categoriesPage.isAddCategoryButtonNotVisible());
+    }
+
+    @Then("Edit and Delete actions should be hidden or disabled")
+    public void edit_and_delete_actions_should_be_hidden_or_disabled() {
+
+        Assert.assertTrue(categoriesPage.isEditActionHiddenOrDisabled());
+        Assert.assertTrue(categoriesPage.isDeleteActionHiddenOrDisabled());
+    }
+
 }
