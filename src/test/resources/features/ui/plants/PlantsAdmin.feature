@@ -1,6 +1,7 @@
 @ui @admin
-Feature: Plant Management Functionality
+Feature: Plant Management Admin Functionality
 
+  @TC_PLT_ADM_01
   Scenario: Verify that admin can navigate to plant page
     Given the user navigates to the "plants" page via sidebar
     When the admin clicks on the "Add Plant" button in the Plant page

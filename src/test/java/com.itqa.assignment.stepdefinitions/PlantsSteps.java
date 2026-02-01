@@ -95,4 +95,50 @@ public class PlantsSteps {
         Assert.assertTrue("Error message should contain: " + expectedMessage + ", but was: " + actualMessage,
                 actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()));
     }
+
+    // ==================== Plant List User View Step Definitions ====================
+
+    @Then("the plant list should be displayed")
+    public void the_plant_list_should_be_displayed() {
+        Assert.assertTrue("Plant list should be displayed",
+                plantPage.isPlantListDisplayed());
+    }
+
+    @Then("the plant list should have pagination")
+    public void the_plant_list_should_have_pagination() {
+        Assert.assertTrue("Plant list should have pagination",
+                plantPage.isPaginationDisplayed());
+    }
+
+    @Then("the {string} button should not be visible")
+    public void the_button_should_not_be_visible(String buttonName) {
+        if (buttonName.equals("Add Plant")) {
+            Assert.assertFalse("Add Plant button should not be visible for user",
+                    plantPage.isAddPlantButtonVisible());
+        }
+    }
+
+    @Then("the Edit and Delete actions should not be visible")
+    public void the_edit_and_delete_actions_should_not_be_visible() {
+        Assert.assertFalse("Edit and Delete actions should not be visible for user",
+                plantPage.areEditAndDeleteActionsVisible());
+    }
+
+    @Then("the page header area should be visible")
+    public void the_page_header_area_should_be_visible() {
+        Assert.assertTrue("Page header area should be visible",
+                plantPage.isPageHeaderVisible());
+    }
+
+    @Then("at least one plant row should be visible")
+    public void at_least_one_plant_row_should_be_visible() {
+        Assert.assertTrue("At least one plant row should be visible",
+                plantPage.isAtLeastOnePlantRowVisible());
+    }
+
+    @Then("the Actions column should be visible")
+    public void the_actions_column_should_be_visible() {
+        Assert.assertTrue("Actions column should be visible",
+                plantPage.isActionsColumnVisible());
+    }
 }

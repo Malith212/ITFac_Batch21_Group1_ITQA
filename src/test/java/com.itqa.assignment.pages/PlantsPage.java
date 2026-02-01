@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 public class PlantsPage {
 
@@ -19,6 +20,16 @@ public class PlantsPage {
     private final By plantNameErrorMessage = By.cssSelector("#name + .text-danger");
     private final By priceErrorMessage = By.cssSelector("#price + .text-danger");
     private final By quantityErrorMessage = By.cssSelector("#quantity + .text-danger");
+
+    // Locators for plant list page (user view)
+    private final By plantTable = By.cssSelector("table.table");
+    private final By plantTableRows = By.cssSelector("table.table tbody tr");
+    private final By paginationElement = By.cssSelector(".pagination, nav[aria-label='Page navigation']");
+    private final By editActionBtn = By.cssSelector("table.table tbody tr td a.btn-warning, table.table tbody tr td a[href*='edit']");
+    private final By deleteActionBtn = By.cssSelector("table.table tbody tr td a.btn-danger, table.table tbody tr td form button.btn-danger");
+    private final By actionsColumn = By.cssSelector("table.table thead th:last-child");
+    private final By pageHeader = By.cssSelector("h3.mb-4, .main-content h3");
+    private final By actionsColumnContent = By.cssSelector("table.table tbody tr td:last-child a, table.table tbody tr td:last-child button");
 
     private WebDriverWait getWait() {
         return new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
@@ -144,6 +155,109 @@ public class PlantsPage {
             return errorElement.getText();
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    // ==================== Plant List Page Methods (User View) ====================
+
+    public boolean isPlantListDisplayed() {
+        try {
+            WebElement table = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+            return table.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isPaginationDisplayed() {
+        try {
+            // Check if pagination exists - it may not be present if there are few records
+            List<WebElement> paginationElements = Driver.getDriver().findElements(paginationElement);
+            return !paginationElements.isEmpty() && paginationElements.get(0).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean hasPlantRecords() {
+        try {
+            List<WebElement> rows = Driver.getDriver().findElements(plantTableRows);
+            return !rows.isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isAddPlantButtonVisible() {
+        try {
+            List<WebElement> addBtns = Driver.getDriver().findElements(addPlantBtn);
+            // Check if any Add Plant button exists and is displayed
+            for (WebElement btn : addBtns) {
+                if (btn.getText().contains("Add") && btn.isDisplayed()) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isEditActionVisible() {
+        try {
+            List<WebElement> editBtns = Driver.getDriver().findElements(editActionBtn);
+            return !editBtns.isEmpty() && editBtns.get(0).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isDeleteActionVisible() {
+        try {
+            List<WebElement> deleteBtns = Driver.getDriver().findElements(deleteActionBtn);
+            return !deleteBtns.isEmpty() && deleteBtns.get(0).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean areEditAndDeleteActionsVisible() {
+        return isEditActionVisible() || isDeleteActionVisible();
+    }
+
+    public boolean hasActionsColumnContent() {
+        try {
+            List<WebElement> actionButtons = Driver.getDriver().findElements(actionsColumnContent);
+            return !actionButtons.isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isPageHeaderVisible() {
+        try {
+            WebElement header = getWait().until(ExpectedConditions.visibilityOfElementLocated(pageHeader));
+            return header.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isAtLeastOnePlantRowVisible() {
+        try {
+            List<WebElement> rows = getWait().until(ExpectedConditions.visibilityOfAllElementsLocatedBy(plantTableRows));
+            return !rows.isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isActionsColumnVisible() {
+        try {
+            WebElement actionsHeader = getWait().until(ExpectedConditions.visibilityOfElementLocated(actionsColumn));
+            return actionsHeader.isDisplayed() && actionsHeader.getText().contains("Actions");
+        } catch (Exception e) {
+            return false;
         }
     }
 }
