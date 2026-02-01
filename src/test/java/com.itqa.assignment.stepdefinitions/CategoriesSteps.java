@@ -136,4 +136,20 @@ public class CategoriesSteps {
     public void the_admin_clicks_the_delete_button() throws InterruptedException {
         categoriesPage.clickDeleteButton();
     }
+
+    @Then("the category should be deleted successfully")
+    public void the_category_should_be_deleted_successfully() {
+
+        String actualMessage = categoriesPage.getSuccessMessageText();
+        Assert.assertEquals("Category deleted successfully", actualMessage);
+    }
+
+
+    @And("success message should be displayed")
+    public void success_message_should_be_displayed() {
+
+        Assert.assertTrue(categoriesPage.getSuccessMessageElement().isDisplayed());
+    }
+
+
 }

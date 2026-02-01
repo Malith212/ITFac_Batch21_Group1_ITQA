@@ -198,7 +198,30 @@ public class CategoriesPage {
 
     /** Delete a category */
     public void clickDeleteButton() {
-        Driver.getDriver().navigate().refresh(); // Refresh before deleting
+
+        Driver.getDriver().navigate().refresh();
+
         wait.until(ExpectedConditions.elementToBeClickable(deleteBtn)).click();
+
+        // Wait for alert
+        wait.until(ExpectedConditions.alertIsPresent());
+
+        // Accept alert
+        Driver.getDriver().switchTo().alert().accept();
+
     }
+
+    By successMessage = By.xpath("//span[contains(text(),'Category deleted successfully')]");
+
+    public WebElement getSuccessMessageElement() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(successMessage));
+    }
+
+    public String getSuccessMessageText() {
+        return getSuccessMessageElement().getText();
+    }
+
+
+
+
 }
