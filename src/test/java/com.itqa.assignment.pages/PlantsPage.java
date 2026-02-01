@@ -13,8 +13,10 @@ public class PlantsPage {
     // Locators
     private final By addPlantBtn = By.cssSelector("a.btn-primary");
     private final By plantNameField = By.id("name");
+    private final By priceField = By.id("price");
     private final By saveBtn = By.cssSelector("button.btn-primary");
     private final By plantNameErrorMessage = By.cssSelector("#name + .text-danger");
+    private final By priceErrorMessage = By.cssSelector("#price + .text-danger");
 
     private WebDriverWait getWait() {
         return new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
@@ -78,6 +80,37 @@ public class PlantsPage {
     public boolean isPlantNameFieldEmpty() {
         WebElement nameField = Driver.getDriver().findElement(plantNameField);
         String value = nameField.getAttribute("value");
+        return value == null || value.trim().isEmpty();
+    }
+
+    // Price field methods
+    public void leavePriceFieldEmpty() {
+        // Ensure the price field is empty
+        WebElement priceInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(priceField));
+        priceInput.clear();
+    }
+
+    public boolean isPriceErrorDisplayed() {
+        try {
+            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(priceErrorMessage));
+            return errorElement.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getPriceErrorMessage() {
+        try {
+            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(priceErrorMessage));
+            return errorElement.getText();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isPriceFieldEmpty() {
+        WebElement priceInput = Driver.getDriver().findElement(priceField);
+        String value = priceInput.getAttribute("value");
         return value == null || value.trim().isEmpty();
     }
 }

@@ -15,3 +15,12 @@ Feature: Plant Management Functionality
     Then the form submission should be blocked
     And the error message "Plant name is required" should be displayed below the Plant Name field in red
 
+  @TC_PLT_ADM_04
+  Scenario: Verify validation for empty price in add plant page
+    Given the user navigates to the "plants" page via sidebar
+    And the admin clicks on the "Add Plant" button in the Plant page
+    When the admin leaves the Price field empty
+    And the admin clicks the Save button
+    Then the form submission should be blocked
+    And the error message "Price is required" should be displayed below the Price field
+

@@ -53,4 +53,28 @@ public class PlantsSteps {
         Assert.assertTrue("Plant Name field should be empty",
                 plantPage.isPlantNameFieldEmpty());
     }
+
+    // Price field step definitions
+    @When("the admin leaves the Price field empty")
+    public void the_admin_leaves_the_price_field_empty() {
+        plantPage.leavePriceFieldEmpty();
+    }
+
+    @Then("the error message {string} should be displayed below the Price field")
+    public void the_error_message_should_be_displayed_below_the_price_field(String expectedMessage) {
+        // Verify error message is displayed
+        Assert.assertTrue("Price error message should be displayed",
+                plantPage.isPriceErrorDisplayed());
+
+        // Verify error message text
+        String actualMessage = plantPage.getPriceErrorMessage();
+        Assert.assertTrue("Error message should contain: " + expectedMessage + ", but was: " + actualMessage,
+                actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()));
+    }
+
+    @Then("the Price field should remain blank")
+    public void the_price_field_should_remain_blank() {
+        Assert.assertTrue("Price field should be empty",
+                plantPage.isPriceFieldEmpty());
+    }
 }
