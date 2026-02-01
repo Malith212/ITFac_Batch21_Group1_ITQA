@@ -19,8 +19,18 @@ public class CommonSteps {
         NavigationHelper.navigateTo(pageName);
     }
 
+    @Given("the admin is on the {string} page")
+    public void the_admin_is_on_the_page(String pageName) {
+        NavigationHelper.navigateTo(pageName);
+    }
+
     @When("the user navigates to the {string} page via sidebar")
     public void the_user_navigates_to_page_via_sidebar(String pageName) {
+        NavigationHelper.navigateViaSidebar(pageName);
+    }
+
+    @When("the admin navigates to the {string} page via sidebar")
+    public void the_admin_navigates_to_page_via_sidebar(String pageName) {
         NavigationHelper.navigateViaSidebar(pageName);
     }
 
@@ -34,15 +44,22 @@ public class CommonSteps {
     @Then("the user should be on the {string} page")
     public void the_user_should_be_on_the_page(String pageName) {
         NavigationHelper.waitForUrlContains(pageName);
-        Assert.assertTrue("Expected to be on " + pageName + " page", 
+        Assert.assertTrue("Expected to be on " + pageName + " page",
             NavigationHelper.isOnPage(pageName));
+    }
+
+    @Then("the admin should be on the {string} page")
+    public void the_admin_should_be_on_the_page(String pageName) {
+        NavigationHelper.waitForUrlContains(pageName);
+        Assert.assertTrue("Expected to be on " + pageName + " page",
+                NavigationHelper.isOnPage(pageName));
     }
 
     @Then("the URL should contain {string}")
     public void the_url_should_contain(String urlSegment) {
         NavigationHelper.waitForUrlContains(urlSegment);
         Assert.assertTrue("URL should contain: " + urlSegment,
-            NavigationHelper.isOnPage(urlSegment) || 
+            NavigationHelper.isOnPage(urlSegment) ||
             com.itqa.assignment.utilities.Driver.getDriver().getCurrentUrl().contains(urlSegment));
     }
 }
