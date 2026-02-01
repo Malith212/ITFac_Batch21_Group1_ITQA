@@ -33,5 +33,5 @@ Feature: Category Management - Admin
     And the admin is on the Categories page
     When the admin searches for a category record
     And the admin clicks the delete button
-#    Then the category should be deleted successfully
-#    And success message should be displayed
+    Then the category should be deleted successfully
+    And success message should be displayed
