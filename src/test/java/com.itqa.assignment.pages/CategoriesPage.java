@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.Select;
+
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -221,7 +223,83 @@ public class CategoriesPage {
         return getSuccessMessageElement().getText();
     }
 
+    //---User Test cases---
 
+
+    // --- PARENT DROPDOWN LOCATOR ---
+    private final By parentDropdown = By.cssSelector("select"); // your CSS locator
+    private final By parentDropdownOptions = By.cssSelector("select option"); // all options
+
+// --- METHODS ---
+
+    /** Click parent dropdown, get all options, and print them */
+    public List<String> getParentDropdownOptions() {
+        // Wait until dropdown is clickable
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(parentDropdown));
+        dropdown.click(); // optional, mostly for UI visibility
+
+        // Get all option elements
+        List<WebElement> options = Driver.getDriver().findElements(parentDropdownOptions);
+
+        // Extract text and print
+        List<String> optionTexts = new ArrayList<>();
+        System.out.println("Parent Dropdown Options:");
+        for (WebElement option : options) {
+            String text = option.getText();
+            optionTexts.add(text);
+            System.out.println(text);
+        }
+
+        return optionTexts;
+    }
+
+    /** Select a parent category by visible text */
+    public void selectParentCategory(String parentName) {
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(parentDropdown));
+        Select select = new Select(dropdown);
+        select.selectByVisibleText(parentName);
+        System.out.println("Selected parent category: " + parentName);
+    }
+
+    /** Click the Search button with explicit waits instead of Thread.sleep */
+    public void clickSearchWithWaits() {
+        // Wait until the Search button is clickable
+        WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(searchBtn));
+
+        // Click the Search button
+        searchButton.click();
+        System.out.println("Search button clicked");
+
+        // Wait until the table is updated with results
+        // Replace the fixed 10s sleep with a wait for the first row of results to be visible
+        By firstRowResult = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]"); // first row of table
+        wait.until(ExpectedConditions.visibilityOfElementLocated(firstRowResult));
+        System.out.println("Search results loaded");
+    }
+
+    // --- TABLE TD LOCATOR ---
+    private final By tableCells = By.xpath("//table/tbody/tr/td");
+
+    /** Verify filtered category is displayed in table */
+    public boolean isFilteredCategoryDisplayed(String categoryName) {
+
+        // Wait until table rows are visible
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(tableCells));
+
+        List<WebElement> cells = Driver.getDriver().findElements(tableCells);
+
+        for (WebElement cell : cells) {
+            String text = cell.getText();
+
+            if (text.equalsIgnoreCase(categoryName)) {
+                System.out.println("Filtered category found: " + text);
+                return true; // break automatically
+            }
+        }
+
+        System.out.println("Filtered category NOT found");
+        return false;
+    }
 
 
 }
