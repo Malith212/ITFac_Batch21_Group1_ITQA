@@ -165,10 +165,23 @@ public class CategoriesPage {
 
     /** Search for a category */
     public void searchCategory(String categoryName) {
+
+        // Wait until search input is visible
         WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
+
+        // Wait until search input is clickable
+        wait.until(ExpectedConditions.elementToBeClickable(searchInput));
+
+        // Clear existing text safely
         input.clear();
+
+        // Enter category name
         input.sendKeys(categoryName);
+
+        // Wait until text is actually entered into input field
+        wait.until(ExpectedConditions.attributeToBe(searchInput, "value", categoryName));
     }
+
 
     /** Click Search button */
     public void clickSearch() {
