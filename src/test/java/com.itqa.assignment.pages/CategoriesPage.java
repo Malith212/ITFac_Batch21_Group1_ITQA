@@ -301,5 +301,46 @@ public class CategoriesPage {
         return false;
     }
 
+    /** Check Add Category button is NOT visible */
+    public boolean isAddCategoryButtonNotVisible() {
+        try {
+            return !Driver.getDriver().findElement(addCategoryBtn).isDisplayed();
+        } catch (Exception e) {
+            // If element is not found in DOM → it is not visible (expected)
+            return true;
+        }
+    }
+
+    private final By editAction = By.xpath("//a[@title='Edit']");
+
+    public boolean isEditActionHiddenOrDisabled() {
+        List<WebElement> elements = Driver.getDriver().findElements(editAction);
+
+        // If element is not present
+        if (elements.isEmpty()) {
+            return true;
+        }
+
+        WebElement edit = elements.get(0);
+
+        // If element exists but hidden or disabled
+        return (!edit.isDisplayed() || !edit.isEnabled());
+    }
+
+    private final By deleteAction = By.xpath("//form[contains(@action,'/ui/categories/delete')]");
+
+    public boolean isDeleteActionHiddenOrDisabled() {
+        List<WebElement> elements = Driver.getDriver().findElements(deleteAction);
+
+        // If element is not present
+        if (elements.isEmpty()) {
+            return true;
+        }
+
+        WebElement delete = elements.get(0);
+
+        return (!delete.isDisplayed() || !delete.isEnabled());
+    }
+
 
 }
