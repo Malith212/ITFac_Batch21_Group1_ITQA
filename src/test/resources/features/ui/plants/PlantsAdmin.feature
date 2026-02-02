@@ -65,3 +65,19 @@ Feature: Plant Management Admin Functionality
     Then the form submission should be blocked
     And the error message "Quantity cannot be negative" should be displayed below the Quantity field
 
+  @mvp
+  Scenario: TC_PLT_ADM_11 - Verify that the system prevents form submission and displays an error when Quantity field is left empty
+    Given the admin is on the "Add Plants" page
+    When the admin leaves the Quantity field empty
+    And the admin clicks the Save button
+    Then the form submission should be blocked
+    And the error message "Quantity is required" should be displayed below the Quantity field
+
+  @mvp
+  Scenario: TC_PLT_ADM_12 - Verify that the system prevents form submission and displays an error when Category is in default/empty state
+    Given the admin is on the "Add Plants" page
+    When the admin leaves the Category field in default or empty state
+    And the admin clicks the Save button
+    Then the form submission should be blocked
+    And the error message "Category is required" should be displayed below the Category field
+

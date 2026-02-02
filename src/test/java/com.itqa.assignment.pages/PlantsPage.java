@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import com.itqa.assignment.utilities.NavigationHelper;
 
 import java.time.Duration;
 import java.util.List;
@@ -17,10 +18,12 @@ public class PlantsPage {
     private final By plantNameField = By.id("name");
     private final By priceField = By.id("price");
     private final By quantityField = By.id("quantity");
+    private final By categoryField = By.id("categoryId");
     private final By saveBtn = By.cssSelector("button.btn-primary");
     private final By plantNameErrorMessage = By.cssSelector("#name + .text-danger");
     private final By priceErrorMessage = By.cssSelector("#price + .text-danger");
     private final By quantityErrorMessage = By.cssSelector("#quantity + .text-danger");
+    private final By categoryErrorMessage = By.cssSelector("#categoryId + .text-danger");
 
     // Locators for plant list page (user view)
     private final By plantTable = By.cssSelector("table.table");
@@ -143,10 +146,21 @@ public class PlantsPage {
         quantityInput.sendKeys("-1");
     }
 
+    public void leaveQuantityFieldEmpty() {
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
+        Driver.getDriver().findElement(quantityField).clear();
+    }
+
     public void enterQuantity(String quantity) {
         WebElement quantityInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
         quantityInput.clear();
         quantityInput.sendKeys(quantity);
+    }
+
+    public void leaveCategoryFieldEmpty() {
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryField));
+        Select categorySelect = new Select(Driver.getDriver().findElement(categoryField));
+        categorySelect.selectByIndex(0);
     }
 
     public boolean isQuantityErrorDisplayed() {
@@ -162,6 +176,24 @@ public class PlantsPage {
         try {
             WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
             return errorElement.getText();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isCategoryErrorDisplayed() {
+        try {
+            NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryErrorMessage));
+            return Driver.getDriver().findElement(categoryErrorMessage).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getCategoryErrorMessage() {
+        try {
+            NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryErrorMessage));
+            return Driver.getDriver().findElement(categoryErrorMessage).getText();
         } catch (Exception e) {
             return "";
         }
