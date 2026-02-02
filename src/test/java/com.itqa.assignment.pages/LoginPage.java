@@ -18,6 +18,20 @@ public class LoginPage {
     }
 
     // 3. Action Method (Direct interaction)
+    public void enterUsername(String username) {
+        Driver.getDriver().findElement(usernameInput).clear();
+        Driver.getDriver().findElement(usernameInput).sendKeys(username);
+    }
+
+    public void enterPassword(String password) {
+        Driver.getDriver().findElement(passwordInput).clear();
+        Driver.getDriver().findElement(passwordInput).sendKeys(password);
+    }
+
+    public void clickLoginBtn() {
+        Driver.getDriver().findElement(loginBtn).click();
+    }
+
     public void submitLogin(String username, String password) {
         // Find and interact directly using the Driver utility
         Driver.getDriver().findElement(usernameInput).clear();
