@@ -141,4 +141,61 @@ public class PlantsSteps {
         Assert.assertTrue("Actions column should be visible",
                 plantPage.isActionsColumnVisible());
     }
+
+    // ==================== Category Management Step Definitions (TC_PLT_ADM_02) ====================
+
+    @When("the admin clicks the Add Category button")
+    public void the_admin_clicks_the_add_category_button() {
+        plantPage.clickAddCategoryButton();
+    }
+
+    @And("the admin enters category name {string}")
+    public void the_admin_enters_category_name(String categoryName) {
+        plantPage.enterCategoryName(categoryName);
+    }
+
+    @And("the admin leaves the parent category empty")
+    public void the_admin_leaves_the_parent_category_empty() {
+        plantPage.leaveParentCategoryEmpty();
+    }
+
+    @And("the admin selects {string} as parent category")
+    public void the_admin_selects_as_parent_category(String parentCategoryName) {
+        plantPage.selectParentCategory(parentCategoryName);
+    }
+
+    @And("the admin clicks the Save Category button")
+    public void the_admin_clicks_the_save_category_button() {
+        plantPage.clickSaveCategoryButton();
+    }
+
+    @Then("the category {string} should be visible in the categories list")
+    public void the_category_should_be_visible_in_the_categories_list(String categoryName) {
+        Assert.assertTrue("Category '" + categoryName + "' should be visible in the list",
+                plantPage.isCategoryVisibleInList(categoryName));
+    }
+
+    @And("the admin deletes category {string}")
+    public void the_admin_deletes_category(String categoryName) {
+        plantPage.deleteCategory(categoryName);
+    }
+
+    // Category dropdown verification in Add Plant page
+    @Then("the Category dropdown should be visible in Add Plant page")
+    public void the_category_dropdown_should_be_visible_in_add_plant_page() {
+        Assert.assertTrue("Category dropdown should be visible in Add Plant page",
+                plantPage.isCategoryDropdownVisibleInAddPlant());
+    }
+
+    @Then("the Category dropdown should contain {string} as selectable option")
+    public void the_category_dropdown_should_contain_as_selectable_option(String categoryName) {
+        Assert.assertTrue("Category dropdown should contain '" + categoryName + "' as selectable option",
+                plantPage.categoryDropdownContainsAsSelectable(categoryName));
+    }
+
+    @Then("the Category dropdown should not contain {string} as selectable option")
+    public void the_category_dropdown_should_not_contain_as_selectable_option(String categoryName) {
+        Assert.assertTrue("Category dropdown should not contain '" + categoryName + "' as selectable option",
+                plantPage.categoryDropdownDoesNotContainAsSelectable(categoryName));
+    }
 }

@@ -7,6 +7,32 @@ Feature: Plant Management Admin Functionality
     When the admin clicks on the "Add Plant" button in the Plant page
     Then the URL should contain "/plants/add"
 
+  @TC_PLT_ADM_02
+  Scenario: Verify Category must be a sub-category in add plant page
+    # Step 1: Create a main category
+    Given the user navigates to the "categories" page via sidebar
+    When the admin clicks the Add Category button
+    And the admin enters category name "MainCat"
+    And the admin leaves the parent category empty
+    And the admin clicks the Save Category button
+    Then the category "MainCat" should be visible in the categories list
+    # Step 2: Create a sub-category under the main category
+    When the admin clicks the Add Category button
+    And the admin enters category name "SubCat"
+    And the admin selects "MainCat" as parent category
+    And the admin clicks the Save Category button
+    Then the category "SubCat" should be visible in the categories list
+    # Step 3: Navigate to Add Plant page and verify category dropdown
+    When the user navigates to the "plants" page via sidebar
+    And the admin clicks on the "Add Plant" button in the Plant page
+    Then the Category dropdown should be visible in Add Plant page
+    And the Category dropdown should contain "SubCat" as selectable option
+    And the Category dropdown should not contain "MainCat" as selectable option
+    # Step 4: Cleanup - Delete sub-category first, then main category
+    When the user navigates to the "categories" page via sidebar
+    And the admin deletes category "SubCat"
+    And the admin deletes category "MainCat"
+
   @TC_PLT_ADM_03
   Scenario: Verify validation for empty plant name in add plant page
     Given the user navigates to the "plants" page via sidebar

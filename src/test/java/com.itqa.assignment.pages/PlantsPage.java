@@ -4,6 +4,7 @@ import com.itqa.assignment.utilities.Driver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -30,6 +31,14 @@ public class PlantsPage {
     private final By actionsColumn = By.cssSelector("table.table thead th:last-child");
     private final By pageHeader = By.cssSelector("h3.mb-4, .main-content h3");
     private final By actionsColumnContent = By.cssSelector("table.table tbody tr td:last-child a, table.table tbody tr td:last-child button");
+
+    // Locators for Category management (used in TC_PLT_ADM_02)
+    private final By addCategoryBtn = By.cssSelector("a.btn-primary");
+    private final By categoryNameField = By.id("name");
+    private final By parentCategoryDropdown = By.id("parentId");
+    private final By saveCategoryBtn = By.cssSelector("button.btn-primary");
+    private final By categoryTableRows = By.cssSelector("table.table tbody tr");
+    private final By categoryDropdownInAddPlant = By.id("categoryId");
 
     private WebDriverWait getWait() {
         return new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
@@ -158,8 +167,6 @@ public class PlantsPage {
         }
     }
 
-    // ==================== Plant List Page Methods (User View) ====================
-
     public boolean isPlantListDisplayed() {
         try {
             WebElement table = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
@@ -258,6 +265,126 @@ public class PlantsPage {
             return actionsHeader.isDisplayed() && actionsHeader.getText().contains("Actions");
         } catch (Exception e) {
             return false;
+        }
+    }
+
+
+    public void clickAddCategoryButton() {
+        WebElement addBtn = getWait().until(ExpectedConditions.elementToBeClickable(addCategoryBtn));
+        addBtn.click();
+    }
+
+    public void enterCategoryName(String name) {
+        WebElement nameField = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryNameField));
+        nameField.clear();
+        nameField.sendKeys(name);
+    }
+
+    public void leaveParentCategoryEmpty() {
+        WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
+        Select select = new Select(dropdown);
+        select.selectByIndex(0); // First option is empty/none for main category
+    }
+
+    public void selectParentCategory(String parentName) {
+        WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
+        Select select = new Select(dropdown);
+        select.selectByVisibleText(parentName);
+    }
+
+    public void clickSaveCategoryButton() {
+        WebElement saveBtn = getWait().until(ExpectedConditions.elementToBeClickable(saveCategoryBtn));
+        saveBtn.click();
+        // Wait for redirect back to categories list (not the add page)
+        getWait().until(ExpectedConditions.not(ExpectedConditions.urlContains("/add")));
+        // Wait for the table to be visible
+        getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
+    }
+
+    public boolean isCategoryVisibleInList(String categoryName) {
+        try {
+            getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
+            List<WebElement> rows = Driver.getDriver().findElements(categoryTableRows);
+            for (WebElement row : rows) {
+                if (row.getText().contains(categoryName)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void deleteCategory(String categoryName) {
+        List<WebElement> rows = Driver.getDriver().findElements(categoryTableRows);
+        for (WebElement row : rows) {
+            if (row.getText().contains(categoryName)) {
+                // Find and click the delete button in this row (inside a form with btn-outline-danger)
+                WebElement deleteBtn = row.findElement(By.cssSelector("form button.btn-outline-danger, form .btn-outline-danger, button.btn-danger, .btn-danger"));
+                deleteBtn.click();
+
+                // Browser will show a confirm dialog - use explicit wait for alert
+                try {
+                    WebDriverWait alertWait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(5));
+                    alertWait.until(ExpectedConditions.alertIsPresent());
+                    Driver.getDriver().switchTo().alert().accept();
+                } catch (Exception e) {
+                    // No alert present or already handled
+                }
+
+                // Wait for the page to refresh
+                try {
+                    getWait().until(ExpectedConditions.stalenessOf(row));
+                } catch (Exception e) {
+                    // Row already removed, wait for table to reload
+                    getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
+                }
+                break;
+            }
+        }
+    }
+
+    // Category dropdown verification in Add Plant page
+    public boolean isCategoryDropdownVisibleInAddPlant() {
+        try {
+            WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            return dropdown.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean categoryDropdownContainsAsSelectable(String categoryName) {
+        try {
+            WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            Select select = new Select(dropdown);
+            List<WebElement> options = select.getOptions();
+            for (WebElement option : options) {
+                if (option.getText().contains(categoryName) && option.isEnabled()) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean categoryDropdownDoesNotContainAsSelectable(String categoryName) {
+        try {
+            WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            Select select = new Select(dropdown);
+            List<WebElement> options = select.getOptions();
+            for (WebElement option : options) {
+                // Check if the category is in the dropdown and enabled (selectable)
+                if (option.getText().contains(categoryName) && option.isEnabled()) {
+                    return false; // Found as selectable, so return false
+                }
+            }
+            return true; // Not found or not selectable
+        } catch (Exception e) {
+            return true;
         }
     }
 }
