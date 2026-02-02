@@ -25,6 +25,7 @@ public class NavigationHelper {
         ROUTES.put("plants", "/plants");
         ROUTES.put("sales", "/sales");
         ROUTES.put("sell-plant", "/sales/new");
+        ROUTES.put("add plants", "/plants/add");
     }
 
     // Sidebar navigation locators
@@ -64,11 +65,15 @@ public class NavigationHelper {
 
     /**
      * Wait until URL contains the expected segment.
-     * @param urlSegment the URL segment to wait for
+     * If the segment matches a known page name in ROUTES, uses the route path instead.
+     * @param urlSegment the URL segment or page name to wait for
      */
     public static void waitForUrlContains(String urlSegment) {
         WebDriverWait wait = getWait();
-        wait.until(ExpectedConditions.urlContains(urlSegment.toLowerCase()));
+        // Check if it's a known page name and use the route path
+        String route = ROUTES.get(urlSegment.toLowerCase());
+        String waitFor = (route != null) ? route : urlSegment.toLowerCase();
+        wait.until(ExpectedConditions.urlContains(waitFor));
     }
 
     /**
