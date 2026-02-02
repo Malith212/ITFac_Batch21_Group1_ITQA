@@ -20,6 +20,7 @@ public class SalesSteps {
     private String selectedPlantName;
 
     // --- SALES PAGE SPECIFIC ACTIONS ---
+    // --- ADMIN FEATURES ---
     @When("the admin clicks on the {string} button in the Sales page")
     public void the_admin_clicks_on_the_button(String buttonName) {
         if (buttonName.equals("Sell Plant")) {
@@ -174,6 +175,77 @@ public class SalesSteps {
     public void deleteCreatedSalesRecord() {
         NavigationHelper.navigateTo("sales");
         salesPage.deleteLatestSalesRecord();
+    }
+
+    // --- SALES USER FEATURES ---
+
+    @Then("the Sales page header should be visible as {string}")
+    public void verifySalesPageHeader(String expectedHeader) {
+        String actualHeader = salesPage.getSalesPageHeaderText();
+        Assert.assertEquals(
+                "Sales page header mismatch",
+                expectedHeader,
+                actualHeader
+        );
+    }
+
+    @Then("the Sales table should be displayed with columns: Plant, Quantity, Total Price, Sold At")
+    public void verifySalesTableColumns() {
+        Assert.assertTrue(
+                "Sales table is not displayed with expected columns",
+                salesPage.isSalesTableDisplayedWithColumns("Plant", "Quantity", "Total Price", "Sold At")
+        );
+    }
+
+    @Then("the pagination controls should be visible")
+    public void verifyPaginationControlsVisible() {
+        Assert.assertTrue(
+                "Pagination controls are not visible",
+                salesPage.isPaginationControlsVisible()
+        );
+    }
+
+    @When("the user clicks on the {string} column header")
+    public void clickColumnHeader(String columnName) {
+        salesPage.clickColumnHeader(columnName);
+    }
+
+    @Then("the sales records should be sorted alphabetically by Plant name")
+    public void verifySortedAlphabeticallyByPlant() {
+        Assert.assertTrue(
+                "Sales records are not sorted alphabetically by Plant name",
+                salesPage.isColumnSortedAlphabetically("Plant")
+        );
+    }
+
+    @Then("the sales records should be sorted numerically by Quantity")
+    public void verifySortedNumericallyByQuantity() {
+        Assert.assertTrue(
+                "Sales records are not sorted numerically by Quantity",
+                salesPage.isColumnSortedNumerically("Quantity")
+        );
+    }
+
+    @Then("the sales records should be sorted numerically by Total Price")
+    public void verifySortedNumericallyByTotalPrice() {
+        Assert.assertTrue(
+                "Sales records are not sorted numerically by Total Price",
+                salesPage.isColumnSortedNumerically("Total Price")
+        );
+    }
+
+    @Given("there are no sales records in the system")
+    public void ensureNoSalesRecords() {
+        // Delete all sales records if any exist
+        salesPage.deleteAllSalesRecords();
+    }
+
+    @Then("the message {string} should be displayed in the table")
+    public void verifyNoSalesMessage(String expectedMessage) {
+        Assert.assertTrue(
+                "Expected message '" + expectedMessage + "' is not displayed",
+                salesPage.isNoSalesMessageDisplayed()
+        );
     }
 
 }

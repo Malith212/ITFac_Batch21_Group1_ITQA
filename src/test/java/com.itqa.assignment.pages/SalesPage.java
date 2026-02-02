@@ -17,8 +17,15 @@ public class SalesPage {
     private final By sellPlantForm  = By.cssSelector("form.card.shadow-sm.p-4");
     private final By salesTableTbody = By.cssSelector("table.table tbody");
     private final By tagNameOption = By.tagName("option");
-    private final By deleteBtnIcon = By.cssSelector("i.bi.bi-trash");
+    private final By deleteBtnIcon = By.cssSelector("button.btn-outline-danger");
     private final By errorMessage = By.cssSelector(".text-danger");
+
+    // Sales Page User Features
+    private final By salesPageHeader = By.cssSelector("h3.mb-4");
+    private final By salesTable = By.cssSelector("table.table");
+    private final By salesTableHeaders = By.cssSelector("table.table thead th");
+    private final By paginationControls = By.cssSelector(".pagination, nav[aria-label='pagination'], .page-item");
+    private final By noSalesMessage = By.cssSelector(".text-muted");
 
     // Dropdown
     private final By plantDropdown = By.id("plantId");
@@ -225,6 +232,190 @@ public class SalesPage {
 
         // Wait for row to be removed
         wait.until(ExpectedConditions.stalenessOf(rows.getFirst()));
+    }
+
+    // --- SALES USER FEATURES ---
+
+    public String getSalesPageHeaderText() {
+        WebDriverWait wait = NavigationHelper.getWait();
+        WebElement header = wait.until(ExpectedConditions.visibilityOfElementLocated(salesPageHeader));
+        return header.getText().trim();
+    }
+
+    public boolean isSalesTableDisplayedWithColumns(String... expectedColumns) {
+        WebDriverWait wait = NavigationHelper.getWait();
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(salesTable));
+            List<WebElement> headers = Driver.getDriver().findElements(salesTableHeaders);
+
+            for (String expectedColumn : expectedColumns) {
+                boolean found = false;
+                for (WebElement header : headers) {
+                    if (header.getText().trim().equalsIgnoreCase(expectedColumn.trim())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isPaginationControlsVisible() {
+        try {
+            List<WebElement> pagination = Driver.getDriver().findElements(paginationControls);
+            return !pagination.isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void clickColumnHeader(String columnName) {
+        WebDriverWait wait = NavigationHelper.getWait();
+        List<WebElement> headers = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(salesTableHeaders));
+
+        for (WebElement header : headers) {
+            if (header.getText().trim().equalsIgnoreCase(columnName.trim())) {
+                header.click();
+                // Wait for sorting to take effect
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                return;
+            }
+        }
+        throw new AssertionError("Column header '" + columnName + "' not found");
+    }
+
+    public boolean isColumnSortedAlphabetically(String columnName) {
+        List<String> values = getColumnValues(columnName);
+        if (values.size() < 2) return true;
+
+        // Check if sorted ascending (A-Z)
+        boolean ascending = true;
+        for (int i = 0; i < values.size() - 1; i++) {
+            if (values.get(i).compareToIgnoreCase(values.get(i + 1)) > 0) {
+                ascending = false;
+                break;
+            }
+        }
+
+        // Check if sorted descending (Z-A)
+        boolean descending = true;
+        for (int i = 0; i < values.size() - 1; i++) {
+            if (values.get(i).compareToIgnoreCase(values.get(i + 1)) < 0) {
+                descending = false;
+                break;
+            }
+        }
+
+        return ascending || descending;
+    }
+
+    public boolean isColumnSortedNumerically(String columnName) {
+        List<String> values = getColumnValues(columnName);
+        if (values.size() < 2) return true;
+
+        // Parse values to numbers
+        List<Double> numbers = new java.util.ArrayList<>();
+        for (String value : values) {
+            String numStr = value.replaceAll("[^0-9.-]", "");
+            if (!numStr.isEmpty()) {
+                numbers.add(Double.parseDouble(numStr));
+            }
+        }
+
+        if (numbers.size() < 2) return true;
+
+        // Check if sorted ascending
+        boolean ascending = true;
+        for (int i = 0; i < numbers.size() - 1; i++) {
+            if (numbers.get(i) > numbers.get(i + 1)) {
+                ascending = false;
+                break;
+            }
+        }
+
+        // Check if sorted descending
+        boolean descending = true;
+        for (int i = 0; i < numbers.size() - 1; i++) {
+            if (numbers.get(i) < numbers.get(i + 1)) {
+                descending = false;
+                break;
+            }
+        }
+
+        return ascending || descending;
+    }
+
+    private List<String> getColumnValues(String columnName) {
+        List<String> values = new java.util.ArrayList<>();
+        WebDriverWait wait = NavigationHelper.getWait();
+
+        // Find column index
+        List<WebElement> headers = Driver.getDriver().findElements(salesTableHeaders);
+        int columnIndex = -1;
+        for (int i = 0; i < headers.size(); i++) {
+            if (headers.get(i).getText().trim().equalsIgnoreCase(columnName.trim())) {
+                columnIndex = i;
+                break;
+            }
+        }
+
+        if (columnIndex == -1) return values;
+
+        // Get values from that column
+        try {
+            WebElement tbody = wait.until(ExpectedConditions.visibilityOfElementLocated(salesTableTbody));
+            List<WebElement> rows = tbody.findElements(By.tagName("tr"));
+
+            for (WebElement row : rows) {
+                List<WebElement> cells = row.findElements(By.tagName("td"));
+                if (columnIndex < cells.size()) {
+                    values.add(cells.get(columnIndex).getText().trim());
+                }
+            }
+        } catch (Exception e) {
+            // Return empty list if table is empty
+        }
+
+        return values;
+    }
+
+    public boolean hasSalesRecords() {
+        try {
+            WebElement tbody = Driver.getDriver().findElement(salesTableTbody);
+            List<WebElement> rows = tbody.findElements(By.tagName("tr"));
+            return !rows.isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isNoSalesMessageDisplayed() {
+        try {
+            List<WebElement> messages = Driver.getDriver().findElements(noSalesMessage);
+            return !messages.isEmpty() && messages.getFirst().isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void deleteAllSalesRecords() {
+        while (hasSalesRecords()) {
+            try {
+                deleteLatestSalesRecord();
+            } catch (Exception e) {
+                break;
+            }
+        }
     }
 
 }
