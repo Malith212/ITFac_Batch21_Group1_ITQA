@@ -272,6 +272,10 @@ public class PlantsPage {
     public void clickAddCategoryButton() {
         WebElement addBtn = getWait().until(ExpectedConditions.elementToBeClickable(addCategoryBtn));
         addBtn.click();
+        // Wait for the URL to contain "/add" indicating we're on the add category page
+        getWait().until(ExpectedConditions.urlContains("/add"));
+        // Wait for the add category form to load (wait for the parent category dropdown to appear)
+        getWait().until(ExpectedConditions.presenceOfElementLocated(parentCategoryDropdown));
     }
 
     public void enterCategoryName(String name) {
@@ -283,7 +287,8 @@ public class PlantsPage {
     public void leaveParentCategoryEmpty() {
         WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
         Select select = new Select(dropdown);
-        select.selectByIndex(0); // First option is empty/none for main category
+        // Select the "Main Category" option (no parent = main category)
+        select.selectByVisibleText("Main Category");
     }
 
     public void selectParentCategory(String parentName) {
