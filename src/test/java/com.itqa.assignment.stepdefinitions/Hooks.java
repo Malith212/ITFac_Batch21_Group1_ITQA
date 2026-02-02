@@ -11,13 +11,13 @@ public class Hooks {
     private final LoginPage loginPage = new LoginPage();
 
     // --- BROWSER SETUP (runs for all @ui scenarios) ---
-    @Before(value = "@ui", order = 1)
+    @Before(value = "@ui", order = 4)
     public void setUpUI() {
         Driver.getDriver();
     }
 
     // --- ADMIN LOGIN PRECONDITION ---
-    @Before(value = "@ui and @admin", order = 2)
+    @Before(value = "@ui and @admin", order = 5)
     public void loginAsAdmin() {
         NavigationHelper.navigateTo("login");
         loginPage.submitLogin("admin", "admin123");
@@ -25,7 +25,7 @@ public class Hooks {
     }
 
     // --- STANDARD USER LOGIN PRECONDITION ---
-    @Before(value = "@ui and @user", order = 2)
+    @Before(value = "@ui and @user", order = 5)
     public void loginAsUser() {
         NavigationHelper.navigateTo("login");
         loginPage.submitLogin("testuser", "test123");
