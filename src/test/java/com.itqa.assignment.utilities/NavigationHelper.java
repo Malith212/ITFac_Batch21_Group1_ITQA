@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class NavigationHelper {
 
-    private static final int DEFAULT_WAIT_SECONDS = 10;
+    private static final int DEFAULT_WAIT_SECONDS = 5;
 
     // Centralized route definitions
     private static final Map<String, String> ROUTES = new HashMap<>();
