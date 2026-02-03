@@ -221,4 +221,63 @@ public class PlantsSteps {
         Assert.assertTrue("Category dropdown should not contain '" + categoryName + "' as selectable option",
                 plantPage.categoryDropdownDoesNotContainAsSelectable(categoryName));
     }
+
+    // ==================== Search Functionality Step Definitions (TC_PLT_USR_02) ====================
+
+    @When("the user enters {string} in the search field")
+    public void the_user_enters_in_the_search_field(String keyword) {
+        plantPage.enterSearchKeyword(keyword);
+    }
+
+    @When("the user enters the created plant name in the search field")
+    public void the_user_enters_the_created_plant_name_in_the_search_field() {
+        String plantName = PlantsHooks.getCreatedPlantName();
+        plantPage.enterSearchKeyword(plantName);
+    }
+
+    @And("the user clicks the Search button")
+    public void the_user_clicks_the_search_button() {
+        plantPage.clickSearchButton();
+    }
+
+    @Then("the search keyword should be entered")
+    public void the_search_keyword_should_be_entered() {
+        String plantName = PlantsHooks.getCreatedPlantName();
+        Assert.assertTrue("Search keyword should be entered in the search field",
+                plantPage.isSearchKeywordEntered(plantName));
+    }
+
+    @Then("the page should refresh or grid should update")
+    public void the_page_should_refresh_or_grid_should_update() {
+        // Verify we're still on the plants page (page refreshed with results)
+        Assert.assertTrue("Should be on the plants page after search",
+                plantPage.isPlantListDisplayed());
+    }
+
+    @Then("only plants matching the name should be displayed")
+    public void only_plants_matching_the_name_should_be_displayed() {
+        String plantName = PlantsHooks.getCreatedPlantName();
+        Assert.assertTrue("Only plants matching '" + plantName + "' should be displayed",
+                plantPage.areOnlyMatchingPlantsDisplayed(plantName));
+    }
+
+    @Then("the created plant should be displayed in the results")
+    public void the_created_plant_should_be_displayed_in_the_results() {
+        String plantName = PlantsHooks.getCreatedPlantName();
+        Assert.assertTrue("Plant '" + plantName + "' should be displayed in the results",
+                plantPage.isPlantDisplayedInResults(plantName));
+    }
+
+    @When("the user enters a non-existent plant name {string} in the search field")
+    public void the_user_enters_a_non_existent_plant_name_in_the_search_field(String keyword) {
+        plantPage.enterSearchKeyword(keyword);
+    }
+
+    @Then("the {string} message should be displayed")
+    public void the_message_should_be_displayed(String expectedMessage) {
+        if (expectedMessage.equals("No plants found")) {
+            Assert.assertTrue("'No plants found' message should be displayed",
+                    plantPage.isNoPlantsFoundMessageDisplayed());
+        }
+    }
 }
