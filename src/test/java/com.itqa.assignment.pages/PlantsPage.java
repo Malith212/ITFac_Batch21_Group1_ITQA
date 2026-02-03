@@ -1,6 +1,7 @@
 package com.itqa.assignment.pages;
 
 import com.itqa.assignment.utilities.Driver;
+import com.itqa.assignment.utilities.NavigationHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -40,9 +41,6 @@ public class PlantsPage {
     private final By categoryTableRows = By.cssSelector("table.table tbody tr");
     private final By categoryDropdownInAddPlant = By.id("categoryId");
 
-    private WebDriverWait getWait() {
-        return new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
-    }
 
     public void clickAddPlantBtn() {
         Driver.getDriver().findElement(addPlantBtn).click();
@@ -50,18 +48,18 @@ public class PlantsPage {
 
     public void leavePlantNameEmpty() {
         // Ensure the plant name field is empty
-        WebElement nameField = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameField));
+        WebElement nameField = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameField));
         nameField.clear();
     }
 
     public void clickSaveButton() {
-        WebElement save = getWait().until(ExpectedConditions.elementToBeClickable(saveBtn));
+        WebElement save = NavigationHelper.getWait().until(ExpectedConditions.elementToBeClickable(saveBtn));
         save.click();
     }
 
     public boolean isPlantNameErrorDisplayed() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameErrorMessage));
             return errorElement.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -70,7 +68,7 @@ public class PlantsPage {
 
     public String getPlantNameErrorMessage() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameErrorMessage));
             return errorElement.getText();
         } catch (Exception e) {
             return "";
@@ -79,7 +77,7 @@ public class PlantsPage {
 
     public boolean isPlantNameErrorInRed() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantNameErrorMessage));
             String color = errorElement.getCssValue("color");
             // Check if the color contains red (common red values: rgb(255, 0, 0), rgb(220, 53, 69), etc.)
             return color.contains("255, 0, 0") || color.contains("220, 53, 69") ||
@@ -108,13 +106,13 @@ public class PlantsPage {
     // Price field methods
     public void leavePriceFieldEmpty() {
         // Ensure the price field is empty
-        WebElement priceInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(priceField));
+        WebElement priceInput = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(priceField));
         priceInput.clear();
     }
 
     public boolean isPriceErrorDisplayed() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(priceErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(priceErrorMessage));
             return errorElement.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -123,7 +121,7 @@ public class PlantsPage {
 
     public String getPriceErrorMessage() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(priceErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(priceErrorMessage));
             return errorElement.getText();
         } catch (Exception e) {
             return "";
@@ -138,20 +136,20 @@ public class PlantsPage {
 
     // Quantity field methods
     public void enterNegativeQuantity() {
-        WebElement quantityInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
+        WebElement quantityInput = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
         quantityInput.clear();
         quantityInput.sendKeys("-1");
     }
 
     public void enterQuantity(String quantity) {
-        WebElement quantityInput = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
+        WebElement quantityInput = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
         quantityInput.clear();
         quantityInput.sendKeys(quantity);
     }
 
     public boolean isQuantityErrorDisplayed() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
             return errorElement.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -160,7 +158,7 @@ public class PlantsPage {
 
     public String getQuantityErrorMessage() {
         try {
-            WebElement errorElement = getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
+            WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
             return errorElement.getText();
         } catch (Exception e) {
             return "";
@@ -169,7 +167,7 @@ public class PlantsPage {
 
     public boolean isPlantListDisplayed() {
         try {
-            WebElement table = getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+            WebElement table = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
             return table.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -243,7 +241,7 @@ public class PlantsPage {
 
     public boolean isPageHeaderVisible() {
         try {
-            WebElement header = getWait().until(ExpectedConditions.visibilityOfElementLocated(pageHeader));
+            WebElement header = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(pageHeader));
             return header.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -252,7 +250,7 @@ public class PlantsPage {
 
     public boolean isAtLeastOnePlantRowVisible() {
         try {
-            List<WebElement> rows = getWait().until(ExpectedConditions.visibilityOfAllElementsLocatedBy(plantTableRows));
+            List<WebElement> rows = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfAllElementsLocatedBy(plantTableRows));
             return !rows.isEmpty();
         } catch (Exception e) {
             return false;
@@ -261,7 +259,7 @@ public class PlantsPage {
 
     public boolean isActionsColumnVisible() {
         try {
-            WebElement actionsHeader = getWait().until(ExpectedConditions.visibilityOfElementLocated(actionsColumn));
+            WebElement actionsHeader = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(actionsColumn));
             return actionsHeader.isDisplayed() && actionsHeader.getText().contains("Actions");
         } catch (Exception e) {
             return false;
@@ -270,45 +268,45 @@ public class PlantsPage {
 
 
     public void clickAddCategoryButton() {
-        WebElement addBtn = getWait().until(ExpectedConditions.elementToBeClickable(addCategoryBtn));
+        WebElement addBtn = NavigationHelper.getWait().until(ExpectedConditions.elementToBeClickable(addCategoryBtn));
         addBtn.click();
         // Wait for the URL to contain "/add" indicating we're on the add category page
-        getWait().until(ExpectedConditions.urlContains("/add"));
+        NavigationHelper.getWait().until(ExpectedConditions.urlContains("/add"));
         // Wait for the add category form to load (wait for the parent category dropdown to appear)
-        getWait().until(ExpectedConditions.presenceOfElementLocated(parentCategoryDropdown));
+        NavigationHelper.getWait().until(ExpectedConditions.presenceOfElementLocated(parentCategoryDropdown));
     }
 
     public void enterCategoryName(String name) {
-        WebElement nameField = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryNameField));
+        WebElement nameField = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryNameField));
         nameField.clear();
         nameField.sendKeys(name);
     }
 
     public void leaveParentCategoryEmpty() {
-        WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
+        WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
         Select select = new Select(dropdown);
         // Select the "Main Category" option (no parent = main category)
         select.selectByVisibleText("Main Category");
     }
 
     public void selectParentCategory(String parentName) {
-        WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
+        WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(parentCategoryDropdown));
         Select select = new Select(dropdown);
         select.selectByVisibleText(parentName);
     }
 
     public void clickSaveCategoryButton() {
-        WebElement saveBtn = getWait().until(ExpectedConditions.elementToBeClickable(saveCategoryBtn));
+        WebElement saveBtn = NavigationHelper.getWait().until(ExpectedConditions.elementToBeClickable(saveCategoryBtn));
         saveBtn.click();
         // Wait for redirect back to categories list (not the add page)
-        getWait().until(ExpectedConditions.not(ExpectedConditions.urlContains("/add")));
+        NavigationHelper.getWait().until(ExpectedConditions.not(ExpectedConditions.urlContains("/add")));
         // Wait for the table to be visible
-        getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
     }
 
     public boolean isCategoryVisibleInList(String categoryName) {
         try {
-            getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
+            NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
             List<WebElement> rows = Driver.getDriver().findElements(categoryTableRows);
             for (WebElement row : rows) {
                 if (row.getText().contains(categoryName)) {
@@ -340,10 +338,10 @@ public class PlantsPage {
 
                 // Wait for the page to refresh
                 try {
-                    getWait().until(ExpectedConditions.stalenessOf(row));
+                    NavigationHelper.getWait().until(ExpectedConditions.stalenessOf(row));
                 } catch (Exception e) {
                     // Row already removed, wait for table to reload
-                    getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
+                    NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryTableRows));
                 }
                 break;
             }
@@ -353,7 +351,7 @@ public class PlantsPage {
     // Category dropdown verification in Add Plant page
     public boolean isCategoryDropdownVisibleInAddPlant() {
         try {
-            WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
             return dropdown.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -362,7 +360,7 @@ public class PlantsPage {
 
     public boolean categoryDropdownContainsAsSelectable(String categoryName) {
         try {
-            WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
             Select select = new Select(dropdown);
             List<WebElement> options = select.getOptions();
             for (WebElement option : options) {
@@ -378,7 +376,7 @@ public class PlantsPage {
 
     public boolean categoryDropdownDoesNotContainAsSelectable(String categoryName) {
         try {
-            WebElement dropdown = getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
             Select select = new Select(dropdown);
             List<WebElement> options = select.getOptions();
             for (WebElement option : options) {
