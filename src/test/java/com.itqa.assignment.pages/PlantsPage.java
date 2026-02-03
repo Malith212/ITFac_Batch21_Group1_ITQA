@@ -41,6 +41,12 @@ public class PlantsPage {
     private final By categoryTableRows = By.cssSelector("table.table tbody tr");
     private final By categoryDropdownInAddPlant = By.id("categoryId");
 
+    // Locators for search functionality
+    private final By searchField = By.cssSelector("input[name='name']");
+    private final By searchButton = By.cssSelector("form button.btn-primary");
+    private final By noPlantsFoundMessage = By.xpath("//*[contains(text(),'No plants found')]");
+    private final By plantRowNames = By.cssSelector("table.table tbody tr td:first-child");
+
 
     public void clickAddPlantBtn() {
         Driver.getDriver().findElement(addPlantBtn).click();
@@ -388,6 +394,72 @@ public class PlantsPage {
             return true; // Not found or not selectable
         } catch (Exception e) {
             return true;
+        }
+    }
+
+    // ==================== Search Functionality Methods ====================
+
+    public void enterSearchKeyword(String keyword) {
+        WebElement search = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(searchField));
+        search.clear();
+        search.sendKeys(keyword);
+    }
+
+    public void clickSearchButton() {
+        WebElement search = NavigationHelper.getWait().until(ExpectedConditions.elementToBeClickable(searchButton));
+        search.click();
+        // Wait for page to refresh/update
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+    }
+
+    public boolean isSearchKeywordEntered(String keyword) {
+        try {
+            WebElement search = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(searchField));
+            String value = search.getAttribute("value");
+            return value != null && value.contains(keyword);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean areOnlyMatchingPlantsDisplayed(String keyword) {
+        try {
+            List<WebElement> rows = Driver.getDriver().findElements(plantRowNames);
+            if (rows.isEmpty()) {
+                return false;
+            }
+            for (WebElement row : rows) {
+                String plantName = row.getText().toLowerCase();
+                if (!plantName.contains(keyword.toLowerCase())) {
+                    return false; // Found a plant that doesn't match
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isNoPlantsFoundMessageDisplayed() {
+        try {
+            WebElement message = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(noPlantsFoundMessage));
+            return message.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isPlantDisplayedInResults(String plantName) {
+        try {
+            List<WebElement> rows = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfAllElementsLocatedBy(plantRowNames));
+            for (WebElement row : rows) {
+                if (row.getText().toLowerCase().contains(plantName.toLowerCase())) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
