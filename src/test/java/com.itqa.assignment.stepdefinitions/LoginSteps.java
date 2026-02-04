@@ -11,21 +11,31 @@ public class LoginSteps {
     LoginPage loginPage = new LoginPage();
 
     // --- 1. LOGIN ACTIONS ---
-    @When("the user enters valid admin credentials")
-    public void the_user_enters_valid_admin_credentials() {
-        loginPage.submitLogin("admin", "admin123");
+    @When("the user enters valid admin username")
+    public void the_user_enters_valid_admin_username() {
+        loginPage.enterUsername("admin");
     }
 
-    @When("the user enters {string} and {string}")
-    public void the_user_enters_and(String username, String password) {
-        loginPage.submitLogin(username, password);
+    @When("the user enters valid admin password")
+    public void the_user_enters_valid_admin_password() {
+        loginPage.enterPassword("admin123");
     }
 
-    // --- 2. ASSERTIONS ---
-    @Then("the user should be redirected to the Dashboard")
-    public void the_user_should_be_redirected_to_the_dashboard() {
-        NavigationHelper.waitForUrlContains("dashboard");
-        Assert.assertTrue(NavigationHelper.isOnPage("dashboard"));
+    @When("the user enters invalid admin username")
+    public void the_user_enters_invalid_admin_username() {
+        loginPage.enterUsername("invalidAdmin");
+    }
+
+    @When("the user enters invalid admin password")
+    public void the_user_enters_invalid_admin_password() {
+        loginPage.enterPassword("wrongPassword");
+    }
+
+    @When("the user clicks the {string} button")
+    public void the_user_clicks_the_button(String buttonName) {
+        if (buttonName.equals("Login")) {
+            loginPage.clickLoginBtn();
+        }
     }
 
     @Then("the user should see an error message {string}")
