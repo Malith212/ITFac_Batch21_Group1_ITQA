@@ -1,5 +1,6 @@
 package com.itqa.assignment.stepdefinitions;
 
+import com.itqa.assignment.pages.LoginPage;
 import com.itqa.assignment.utilities.NavigationHelper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -11,6 +12,25 @@ import org.junit.Assert;
  * These steps can be used across multiple feature files.
  */
 public class CommonSteps {
+
+    private final LoginPage loginPage = new LoginPage();
+
+    // --- LOGIN STEPS (BACKGROUND/PRECONDITION) ---
+
+    @Given("the admin is logged into the system")
+    public void logged_in_as_an_admin() {
+        NavigationHelper.navigateTo("login");
+        loginPage.submitLogin("admin", "admin123");
+        NavigationHelper.waitForUrlContains("dashboard");
+    }
+
+    @Given("the user is logged into the system")
+    public void logged_in_as_a_user() {
+        NavigationHelper.navigateTo("login");
+        loginPage.submitLogin("testuser", "test123");
+        NavigationHelper.waitForUrlContains("dashboard");
+    }
+
     // --- GENERIC NAVIGATION STEPS ---
 
     @Given("the user is on the {string} page")

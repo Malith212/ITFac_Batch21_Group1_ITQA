@@ -1,4 +1,757 @@
 package com.itqa.assignment.pages;
 
+import com.itqa.assignment.utilities.Driver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.Select;
+import java.util.Collections;
+
+
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CategoriesPage {
+
+    // ------------------------
+    // --- WEBDRIVER WAIT ---
+    // ------------------------
+    private final WebDriverWait wait = new WebDriverWait(Driver.getDriver(), Duration.ofSeconds(10));
+
+    // ------------------------
+    // --- MENU LOCATORS ---
+    // ------------------------
+    private final By categoriesMenuItem = By.xpath("/html/body/div[1]/div/div[1]/a[2]"); // Admin left menu "Categories"
+
+    // ------------------------
+    // --- PAGE ELEMENTS LOCATORS ---
+    // ------------------------
+    private final By header = By.xpath("//h3[@class='mb-4']");
+    private final By searchInput = By.xpath("//input[@type='text']");
+    private final By categoryDropdown = By.xpath("//select[@class='form-select']");
+    private final By searchBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/button");
+    private final By resetBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/a[1]");
+    private final By addCategoryBtn = By.xpath("//a[@href='/ui/categories/add']");
+    private final By categoryNameInput = By.xpath("//input");
+    private final By saveCategoryBtn = By.xpath("//button[@type='submit']");
+
+    // ------------------------
+    // --- TABLE LOCATORS ---
+    // ------------------------
+    private final By idColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[1]");
+    private final By nameColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[2]");
+    private final By parentColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[3]");
+    private final By actionsColumn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[4]");
+
+    // --- SORT INDICATORS ---
+    private final By idSortIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[1]/a/span");
+    private final By nameSortIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[2]/a/span");
+
+    // --- TABLE DATA ---
+    private final By allNames = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
+    private final By allIds = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]");
+    private final By firstRowId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]/td[1]");
+    private final By searchResultRecord = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
+    private final By deleteBtn = By.xpath("//button[@title='Delete']");
+
+    // ------------------------
+    // --- NAVIGATION METHODS ---
+    // ------------------------
+    /** Navigate to Categories page via menu */
+    public void visit() {
+        wait.until(ExpectedConditions.elementToBeClickable(categoriesMenuItem)).click();
+    }
+
+    // ------------------------
+    // --- VISIBILITY CHECKS ---
+    // ------------------------
+    public boolean isCategoriesPageDisplayed() {
+        return Driver.getDriver().getCurrentUrl().contains("categories");
+    }
+
+    public boolean isHeaderVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(header)).isDisplayed();
+    }
+
+    public boolean isSearchInputVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput)).isDisplayed();
+    }
+
+    public boolean isCategoryDropdownVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(categoryDropdown)).isDisplayed();
+    }
+
+    public boolean isSearchButtonVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(searchBtn)).isDisplayed();
+    }
+
+    public boolean isResetButtonVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(resetBtn)).isDisplayed();
+    }
+
+    public boolean isAddCategoryButtonVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(addCategoryBtn)).isDisplayed();
+    }
+
+    public boolean isIdColumnVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(idColumn)).isDisplayed();
+    }
+
+    public boolean isNameColumnVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(nameColumn)).isDisplayed();
+    }
+
+    public boolean isParentColumnVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(parentColumn)).isDisplayed();
+    }
+
+    public boolean isActionsColumnVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(actionsColumn)).isDisplayed();
+    }
+
+    // ------------------------
+    // --- SORTING METHODS ---
+    // ------------------------
+    /** Click on ID column to sort */
+    public void clickIdColumn() {
+        wait.until(ExpectedConditions.elementToBeClickable(idColumn)).click();
+    }
+
+    /** Check if ID sort indicator is visible */
+    public boolean isIdSortIndicatorVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(idSortIndicator)).isDisplayed();
+    }
+
+    /** Click on Name column to sort */
+    public void clickNameColumn() {
+        wait.until(ExpectedConditions.elementToBeClickable(nameColumn)).click();
+    }
+
+    /** Check if Name sort indicator is visible */
+    public boolean isNameSortIndicatorVisible() {
+        try {
+            Thread.sleep(2000); // Wait for sorting animation
+            return Driver.getDriver().findElement(nameSortIndicator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // ------------------------
+    // --- TABLE DATA METHODS ---
+    // ------------------------
+    /** Get all category names from the table */
+    public List<String> getAllCategoryNames() {
+        List<String> names = new ArrayList<>();
+        for (WebElement element : Driver.getDriver().findElements(allNames)) {
+            names.add(element.getText());
+        }
+        System.out.println("All Names: " + names);
+        return names;
+    }
+
+    /** Get all category IDs from the table */
+    public List<String> getAllCategoryIds() {
+        List<String> ids = new ArrayList<>();
+        for (WebElement element : Driver.getDriver().findElements(allIds)) {
+            ids.add(element.getText());
+        }
+        System.out.println("All IDs: " + ids);
+        return ids;
+    }
+
+    /** Get ID of the first row */
+    public String getFirstRowId() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(firstRowId)).getText();
+    }
+
+    // ------------------------
+    // --- CATEGORY ACTIONS ---
+    // ------------------------
+    /** Add a category */
+    public void addCategory(String categoryName) {
+        wait.until(ExpectedConditions.elementToBeClickable(addCategoryBtn)).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(categoryNameInput)).sendKeys(categoryName);
+        wait.until(ExpectedConditions.elementToBeClickable(saveCategoryBtn)).click();
+    }
+
+    /** Search for a category */
+    public void searchCategory(String categoryName) {
+
+        // Wait for any stale element to be refreshed by waiting for presence and then visibility
+        wait.until(ExpectedConditions.presenceOfElementLocated(searchInput));
+
+        // Use a retry mechanism to handle StaleElementReferenceException
+        int maxRetries = 3;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                // Re-locate the element fresh each attempt to avoid stale reference
+                WebElement input = wait.until(ExpectedConditions.refreshed(
+                    ExpectedConditions.elementToBeClickable(searchInput)));
+
+                // Clear existing text safely
+                input.clear();
+
+                // Enter category name
+                input.sendKeys(categoryName);
+
+                // Wait until text is actually entered into input field
+                wait.until(ExpectedConditions.attributeToBe(searchInput, "value", categoryName));
+
+                // If successful, break out of retry loop
+                break;
+            } catch (org.openqa.selenium.StaleElementReferenceException e) {
+                if (attempt == maxRetries - 1) {
+                    throw e; // Re-throw if all retries exhausted
+                }
+                // Use explicit wait instead of Thread.sleep - wait for element to become stale and then reappear
+                wait.until(ExpectedConditions.stalenessOf(
+                    Driver.getDriver().findElement(searchInput)));
+                wait.until(ExpectedConditions.presenceOfElementLocated(searchInput));
+            }
+        }
+    }
+
+
+    /** Click Search button */
+    public void clickSearch() {
+        wait.until(ExpectedConditions.elementToBeClickable(searchBtn)).click();
+    }
+
+    // --- Get search result text safely ---
+    public String getSearchResultText() {
+        // Explicit wait for the search result element to be visible
+        WebElement result = wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultRecord));
+        return result.getText();
+    }
+
+
+    /** Delete a category */
+    public void clickDeleteButton() {
+
+        Driver.getDriver().navigate().refresh();
+
+        wait.until(ExpectedConditions.elementToBeClickable(deleteBtn)).click();
+
+        // Wait for alert
+        wait.until(ExpectedConditions.alertIsPresent());
+
+        // Accept alert
+        Driver.getDriver().switchTo().alert().accept();
+
+    }
+
+    By successMessage = By.xpath("//span[contains(text(),'Category deleted successfully')]");
+
+    public WebElement getSuccessMessageElement() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(successMessage));
+    }
+
+    public String getSuccessMessageText() {
+        return getSuccessMessageElement().getText();
+    }
+
+    //---User Test cases---
+
+
+    // --- PARENT DROPDOWN LOCATOR ---
+    private final By parentDropdown = By.cssSelector("select"); // your CSS locator
+    private final By parentDropdownOptions = By.cssSelector("select option"); // all options
+
+// --- METHODS ---
+
+    /** Click parent dropdown, get all options, and print them */
+    public List<String> getParentDropdownOptions() {
+        // Wait until dropdown is clickable
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(parentDropdown));
+        dropdown.click(); // optional, mostly for UI visibility
+
+        // Get all option elements
+        List<WebElement> options = Driver.getDriver().findElements(parentDropdownOptions);
+
+        // Extract text and print
+        List<String> optionTexts = new ArrayList<>();
+        System.out.println("Parent Dropdown Options:");
+        for (WebElement option : options) {
+            String text = option.getText();
+            optionTexts.add(text);
+            System.out.println(text);
+        }
+
+        return optionTexts;
+    }
+
+    /** Select a parent category by visible text */
+    public void selectParentCategory(String parentName) {
+        WebElement dropdown = wait.until(ExpectedConditions.elementToBeClickable(parentDropdown));
+        Select select = new Select(dropdown);
+        select.selectByVisibleText(parentName);
+        System.out.println("Selected parent category: " + parentName);
+    }
+
+    /** Click the Search button with explicit waits instead of Thread.sleep */
+    public void clickSearchWithWaits() {
+        // Wait until the Search button is clickable
+        WebElement searchButton = wait.until(ExpectedConditions.elementToBeClickable(searchBtn));
+
+        // Click the Search button
+        searchButton.click();
+        System.out.println("Search button clicked");
+
+        // Wait until the table is updated with results
+        // Replace the fixed 10s sleep with a wait for the first row of results to be visible
+        By firstRowResult = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]"); // first row of table
+        wait.until(ExpectedConditions.visibilityOfElementLocated(firstRowResult));
+        System.out.println("Search results loaded");
+    }
+
+    // --- TABLE TD LOCATOR ---
+    private final By tableCells = By.xpath("//table/tbody/tr/td");
+
+    /** Verify filtered category is displayed in table */
+    public boolean isFilteredCategoryDisplayed(String categoryName) {
+
+        // Wait until table rows are visible
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(tableCells));
+
+        List<WebElement> cells = Driver.getDriver().findElements(tableCells);
+
+        for (WebElement cell : cells) {
+            String text = cell.getText();
+
+            if (text.equalsIgnoreCase(categoryName)) {
+                System.out.println("Filtered category found: " + text);
+                return true; // break automatically
+            }
+        }
+
+        System.out.println("Filtered category NOT found");
+        return false;
+    }
+
+    /** Check Add Category button is NOT visible */
+    public boolean isAddCategoryButtonNotVisible() {
+        try {
+            return !Driver.getDriver().findElement(addCategoryBtn).isDisplayed();
+        } catch (Exception e) {
+            // If element is not found in DOM → it is not visible (expected)
+            return true;
+        }
+    }
+
+    private final By editAction = By.xpath("//a[@title='Edit']");
+
+    public boolean isEditActionHiddenOrDisabled() {
+        List<WebElement> elements = Driver.getDriver().findElements(editAction);
+
+        // If element is not present
+        if (elements.isEmpty()) {
+            return true;
+        }
+
+        WebElement edit = elements.get(0);
+
+        // If element exists but hidden or disabled
+        return (!edit.isDisplayed() || !edit.isEnabled());
+    }
+
+    private final By deleteAction = By.xpath("//form[contains(@action,'/ui/categories/delete')]");
+
+    public boolean isDeleteActionHiddenOrDisabled() {
+        List<WebElement> elements = Driver.getDriver().findElements(deleteAction);
+
+        // If element is not present
+        if (elements.isEmpty()) {
+            return true;
+        }
+
+        WebElement delete = elements.get(0);
+
+        return (!delete.isDisplayed() || !delete.isEnabled());
+    }
+
+    public void navigateToAddCategoryPage() {
+        Driver.getDriver().navigate().to(
+                Driver.getDriver().getCurrentUrl().split("/ui")[0] + "/ui/categories/add"
+        );
+    }
+
+    // Access Denied header
+    private final By accessDeniedHeader = By.cssSelector("h2");
+
+
+    public boolean isAccessDeniedPageDisplayed() {
+
+        try {
+            WebElement header = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(accessDeniedHeader)
+            );
+
+            String actualText = header.getText().trim();
+
+            System.out.println("Access Denied Page Text: " + actualText);
+
+            return actualText.equals("403 - Access Denied");
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void enterInvalidCategoryName(String categoryName) {
+
+        WebElement inputField = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchInput)
+        );
+
+        inputField.clear();
+        inputField.sendKeys(categoryName);
+
+        System.out.println("Entered invalid category name: " + categoryName);
+    }
+
+    private final By noCategoryMessage = By.xpath("//td[@class='text-center text-muted py-4']");
+
+    public boolean isNoCategoryMessageDisplayed(String expectedMessage) {
+
+        try {
+            WebElement messageElement = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(noCategoryMessage)
+            );
+
+            String actualMessage = messageElement.getText().trim();
+
+            System.out.println("No Category Message: " + actualMessage);
+
+            return actualMessage.equals(expectedMessage);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    //pramesh - user
+
+// ------------------------
+// --- USER READ ONLY CHECK ---
+// ------------------------
+
+    public boolean isCategoryListVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(allNames)).isDisplayed();
+    }
+
+    public boolean isCategoryListReadOnly() {
+
+        boolean addHidden = isAddCategoryButtonNotVisible();
+        boolean editHidden = isEditActionHiddenOrDisabled();
+        boolean deleteHidden = isDeleteActionHiddenOrDisabled();
+
+        return addHidden && editHidden && deleteHidden;
+    }
+
+
+    public void enterCategoryName(String categoryName) {
+        WebElement input = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchInput)
+        );
+        input.clear();
+        input.sendKeys(categoryName);
+        System.out.println("Entered category name: " + categoryName);
+    }
+
+    public boolean isCategoryPresentInTable(String categoryName) {
+
+        // Wait until table cells are visible
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(tableCells));
+
+        List<WebElement> cells = Driver.getDriver().findElements(tableCells);
+
+        for (WebElement cell : cells) {
+            String text = cell.getText().trim();
+
+            if (text.equalsIgnoreCase(categoryName)) {
+                System.out.println("Category found in table: " + text);
+                return true;
+            }
+        }
+
+        System.out.println("Category NOT found in table: " + categoryName);
+        return false;
+    }
+
+    public void clickParentColumn() {
+        wait.until(ExpectedConditions.elementToBeClickable(parentColumn)).click();
+    }
+
+    private final By parentSortIndicator =
+            By.xpath("//th[3]//span");
+
+
+    public boolean isParentSortIndicatorVisible() {
+        return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(parentSortIndicator)
+        ).isDisplayed();
+    }
+
+    private final By parentColumnCells = By.xpath("//table/tbody/tr/td[3]");
+
+    public boolean areCategoriesSortedByParent() {
+
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(parentColumnCells));
+
+        List<WebElement> cells = Driver.getDriver().findElements(parentColumnCells);
+
+        List<String> parents = new ArrayList<>();
+
+        for (WebElement cell : cells) {
+            String text = cell.getText().trim();
+
+            // Ignore rows with no parent ("-")
+            if (!text.equals("-")) {
+                parents.add(text);
+            }
+        }
+
+        System.out.println("Filtered parent values (ignoring '-'): " + parents);
+
+        // Check list is sorted
+        for (int i = 0; i < parents.size() - 1; i++) {
+            if (parents.get(i).compareToIgnoreCase(parents.get(i + 1)) > 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private final By addCategoryHeader = By.xpath("//h3");
+
+    public void clickAddCategoryButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(addCategoryBtn)).click();
+    }
+
+    public boolean isAddCategoryPageDisplayed() {
+        return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(addCategoryHeader)
+        ).isDisplayed();
+    }
+
+    private final By addCategorySaveBtn = By.xpath("//button");
+    private final By validationMessages = By.xpath("//div[@class='invalid-feedback']");
+
+    public void clickSaveButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(addCategorySaveBtn)).click();
+        System.out.println("Clicked Save button");
+    }
+
+    public boolean isValidationMessageDisplayed(String expectedMessage) {
+
+        List<WebElement> messages = wait.until(
+                ExpectedConditions.visibilityOfAllElementsLocatedBy(validationMessages)
+        );
+
+        System.out.println("Validation messages displayed:");
+
+        for (WebElement message : messages) {
+            String actualText = message.getText().trim();
+            System.out.println(actualText);
+
+            if (actualText.contains(expectedMessage)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private final By cancelBtn = By.xpath("//a[@class='btn btn-secondary']");
+
+    public void clickCancelButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(cancelBtn)).click();
+        System.out.println("Clicked Cancel button");
+    }
+
+    public boolean isCategoriesPageElementsVisible() {
+
+        boolean headerVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(header)
+        ).isDisplayed();
+
+        boolean searchInputVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchInput)
+        ).isDisplayed();
+
+        boolean dropdownVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(categoryDropdown)
+        ).isDisplayed();
+
+        boolean searchBtnVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchBtn)
+        ).isDisplayed();
+
+        boolean resetBtnVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(resetBtn)
+        ).isDisplayed();
+
+        boolean addBtnVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(addCategoryBtn)
+        ).isDisplayed();
+
+        System.out.println("Categories page elements visibility:");
+        System.out.println("Header: " + headerVisible);
+        System.out.println("Search input: " + searchInputVisible);
+        System.out.println("Dropdown: " + dropdownVisible);
+        System.out.println("Search button: " + searchBtnVisible);
+        System.out.println("Reset button: " + resetBtnVisible);
+        System.out.println("Add Category button: " + addBtnVisible);
+
+        return headerVisible
+                && searchInputVisible
+                && dropdownVisible
+                && searchBtnVisible
+                && resetBtnVisible
+                && addBtnVisible;
+    }
+
+    // ==================== Add Main Category Methods ====================
+
+    private final By addCategoryNameInput = By.id("name");
+    private final By parentCategorySelect = By.id("parentId");
+
+    /** Enter category name in Add Category form */
+    public void enterCategoryNameInAddForm(String categoryName) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(addCategoryNameInput));
+        input.clear();
+        input.sendKeys(categoryName);
+        System.out.println("Entered category name in Add form: " + categoryName);
+    }
+
+    /** Leave parent category empty (select "Main Category" option) */
+    public void leaveParentCategoryEmpty() {
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(parentCategorySelect));
+        Select select = new Select(dropdown);
+        select.selectByValue(""); // Select the "Main Category" option with empty value
+        System.out.println("Left parent category empty (Main Category selected)");
+    }
+
+    /** Check if category was created successfully by checking redirect */
+    public boolean isCategoryCreatedSuccessfully() {
+        try {
+            wait.until(ExpectedConditions.urlContains("/categories"));
+            String currentUrl = Driver.getDriver().getCurrentUrl();
+            return currentUrl.contains("/categories");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Check if a category name is present in the category list table */
+    public boolean isCategoryInList(String categoryName) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table tbody")));
+            List<WebElement> cells = Driver.getDriver().findElements(allNames);
+            for (WebElement cell : cells) {
+                if (cell.getText().trim().equalsIgnoreCase(categoryName)) {
+                    System.out.println("Category found in list: " + categoryName);
+                    return true;
+                }
+            }
+            System.out.println("Category NOT found in list: " + categoryName);
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Delete a category by name from the category list via UI */
+    public void deleteCategoryByName(String categoryName) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table tbody")));
+
+            // Find all rows in the table
+            List<WebElement> rows = Driver.getDriver().findElements(By.cssSelector("table.table tbody tr"));
+
+            for (WebElement row : rows) {
+                // Get the name cell (second column)
+                WebElement nameCell = row.findElement(By.cssSelector("td:nth-child(2)"));
+                String cellText = nameCell.getText().trim();
+
+                if (cellText.equalsIgnoreCase(categoryName)) {
+                    System.out.println("Found category to delete: " + categoryName);
+
+                    // Find and click the delete button in this row
+                    WebElement deleteBtn = row.findElement(By.cssSelector("form[action*='/delete'] button.btn-outline-danger"));
+                    deleteBtn.click();
+
+                    // Handle browser confirmation dialog
+                    try {
+                        wait.until(ExpectedConditions.alertIsPresent());
+                        Driver.getDriver().switchTo().alert().accept();
+                        System.out.println("Confirmed delete alert");
+                    } catch (Exception e) {
+                        // No alert present, continue
+                    }
+
+                    // Wait for page to reload
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table")));
+                    System.out.println("Category deleted successfully: " + categoryName);
+                    return;
+                }
+            }
+            System.out.println("Category not found for deletion: " + categoryName);
+        } catch (Exception e) {
+            System.out.println("Error deleting category: " + e.getMessage());
+        }
+    }
+
+    /** Select a parent category by name from the parent category dropdown */
+    public void selectParentCategoryByName(String parentCategoryName) {
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(parentCategorySelect));
+        Select select = new Select(dropdown);
+
+        // Get all options and find the one matching the category name
+        List<WebElement> options = select.getOptions();
+        for (WebElement option : options) {
+            if (option.getText().trim().equalsIgnoreCase(parentCategoryName)) {
+                select.selectByVisibleText(option.getText());
+                System.out.println("Selected parent category: " + parentCategoryName);
+                return;
+            }
+        }
+        System.out.println("Parent category not found in dropdown: " + parentCategoryName);
+    }
+
+    /** Check if a category has a specific parent in the category list table */
+    public boolean isCategoryWithParent(String categoryName, String expectedParentName) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table tbody")));
+
+            // Find all rows in the table
+            List<WebElement> rows = Driver.getDriver().findElements(By.cssSelector("table.table tbody tr"));
+
+            for (WebElement row : rows) {
+                // Get the name cell (second column)
+                WebElement nameCell = row.findElement(By.cssSelector("td:nth-child(2)"));
+                String cellName = nameCell.getText().trim();
+
+                if (cellName.equalsIgnoreCase(categoryName)) {
+                    // Get the parent cell (third column)
+                    WebElement parentCell = row.findElement(By.cssSelector("td:nth-child(3)"));
+                    String parentName = parentCell.getText().trim();
+
+                    boolean matches = parentName.equalsIgnoreCase(expectedParentName);
+                    System.out.println("Category '" + categoryName + "' has parent '" + parentName + "' (expected: '" + expectedParentName + "'): " + matches);
+                    return matches;
+                }
+            }
+            System.out.println("Category not found: " + categoryName);
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error checking category parent: " + e.getMessage());
+            return false;
+        }
+    }
 }

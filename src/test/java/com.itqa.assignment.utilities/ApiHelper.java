@@ -5,21 +5,35 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ApiHelper {
 
-    private static String jwtToken = null;
+    public enum UserRole {
+        ADMIN,
+        USER
+    }
+
+    private static final Map<UserRole, String> tokenCache = new HashMap<>();
 
     /**
-     * Authenticates with the API and retrieves a JWT token.
-     * The token is cached for subsequent requests.
+     * Authenticates with the API and retrieves a JWT token for the specified role.
+     * Tokens are cached per role for subsequent requests.
      */
-    private static String getJwtToken() {
-        if (jwtToken == null) {
+    public static String getJwtToken(UserRole role) {
+        if (!tokenCache.containsKey(role)) {
             String baseUri = ConfigReader.getProperty("api.base.uri");
-            String username = ConfigReader.getProperty("api.username");
-            String password = ConfigReader.getProperty("api.password");
+            String username;
+            String password;
+
+            if (role == UserRole.ADMIN) {
+                username = ConfigReader.getProperty("api.admin.username");
+                password = ConfigReader.getProperty("api.admin.password");
+            } else {
+                username = ConfigReader.getProperty("api.user.username");
+                password = ConfigReader.getProperty("api.user.password");
+            }
 
             Map<String, String> credentials = Map.of(
                     "username", username,
@@ -33,45 +47,62 @@ public class ApiHelper {
                     .post("/auth/login");
 
             if (response.getStatusCode() != 200) {
-                throw new RuntimeException("Authentication failed: " + response.getStatusLine());
+                throw new RuntimeException("Authentication failed for " + role + ": " + response.getStatusLine());
             }
 
             // Try to extract token from different possible response formats
-            jwtToken = response.jsonPath().getString("token");
-            if (jwtToken == null) {
-                jwtToken = response.jsonPath().getString("accessToken");
+            String token = response.jsonPath().getString("token");
+            if (token == null) {
+                token = response.jsonPath().getString("accessToken");
             }
-            if (jwtToken == null) {
-                jwtToken = response.jsonPath().getString("jwt");
+            if (token == null) {
+                token = response.jsonPath().getString("jwt");
             }
-            if (jwtToken == null) {
+            if (token == null) {
                 throw new RuntimeException("Could not extract JWT token from response: " + response.getBody().asString());
             }
+            tokenCache.put(role, token);
         }
-        return jwtToken;
+        return tokenCache.get(role);
     }
 
     /**
-     * Clears the cached JWT token. Call this if you need to re-authenticate.
+     * Clears all cached JWT tokens. Call this if you need to re-authenticate.
      */
+    @SuppressWarnings("unused")
     public static void clearToken() {
-        jwtToken = null;
+        tokenCache.clear();
     }
 
-    private static RequestSpecification getRequestSpec() {
+    /**
+     * Clears the cached JWT token for a specific role.
+     */
+    @SuppressWarnings("unused")
+    public static void clearToken(UserRole role) {
+        tokenCache.remove(role);
+    }
+
+    public static RequestSpecification getRequestSpec(UserRole role) {
         return RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 // JWT Bearer token authentication
-                .header("Authorization", "Bearer " + getJwtToken())
+                .header("Authorization", "Bearer " + getJwtToken(role))
                 .contentType(ContentType.JSON)
                 .log().ifValidationFails();
     }
 
     /**
-     * Reusable POST method that returns the ID of the created resource
+     * Reusable POST method that returns the ID of the created resource (uses ADMIN role by default)
      */
     public static String postAndGetId(String endpoint, Object body) {
-        Response response = getRequestSpec()
+        return postAndGetId(endpoint, body, UserRole.ADMIN);
+    }
+
+    /**
+     * Reusable POST method that returns the ID of the created resource for a specific role
+     */
+    public static String postAndGetId(String endpoint, Object body, UserRole role) {
+        Response response = getRequestSpec(role)
                 .body(body)
                 .post(endpoint);
 
@@ -83,10 +114,17 @@ public class ApiHelper {
     }
 
     /**
-     * Reusable POST method with query parameters that returns the ID of the created resource
+     * Reusable POST method with query parameters that returns the ID of the created resource (uses ADMIN role by default)
      */
     public static String postWithParams(String endpoint, Map<String, Object> queryParams) {
-        RequestSpecification spec = getRequestSpec();
+        return postWithParams(endpoint, queryParams, UserRole.ADMIN);
+    }
+
+    /**
+     * Reusable POST method with query parameters that returns the ID of the created resource for a specific role
+     */
+    public static String postWithParams(String endpoint, Map<String, Object> queryParams, UserRole role) {
+        RequestSpecification spec = getRequestSpec(role);
         if (queryParams != null) {
             for (Map.Entry<String, Object> entry : queryParams.entrySet()) {
                 spec.queryParam(entry.getKey(), entry.getValue());
@@ -103,10 +141,17 @@ public class ApiHelper {
     }
 
     /**
-     * Reusable DELETE method
+     * Reusable DELETE method (uses ADMIN role by default)
      */
     public static void deleteResource(String endpoint, int id) {
-        getRequestSpec()
+        deleteResource(endpoint, id, UserRole.ADMIN);
+    }
+
+    /**
+     * Reusable DELETE method for a specific role
+     */
+    public static void deleteResource(String endpoint, int id, UserRole role) {
+        getRequestSpec(role)
                 .delete(endpoint + "/" + id);
     }
 }

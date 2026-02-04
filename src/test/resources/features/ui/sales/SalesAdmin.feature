@@ -1,5 +1,8 @@
-@ui @admin
+@ui
 Feature: Sales Management Functionality
+
+  Background:
+    Given the admin is logged into the system
 
   @SeedSalesAdminTests
   Scenario: TC_SLS_ADM_01 - Verify that admin can navigate to sell plant page
