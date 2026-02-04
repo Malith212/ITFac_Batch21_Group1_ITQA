@@ -266,5 +266,42 @@ public class CategoriesSteps {
         );
     }
 
+    @When("the admin clicks the Add Category button")
+    public void the_admin_clicks_the_add_category_button() {
+        categoriesPage.clickAddCategoryButton();
+    }
+
+    @Then("the Add Category page should be displayed")
+    public void the_add_category_page_should_be_displayed() {
+        Assert.assertTrue(categoriesPage.isAddCategoryPageDisplayed());
+    }
+
+    @And("the admin clicks the Save button")
+    public void the_admin_clicks_the_save_button() {
+        categoriesPage.clickSaveButton();
+    }
+
+    @Then("an error message {string} should be displayed")
+    public void an_error_message_should_be_displayed(String message) {
+        Assert.assertTrue(
+                "Expected error message NOT found: " + message,
+                categoriesPage.isValidationMessageDisplayed(message)
+        );
+    }
+
+    @And("the admin clicks the Cancel button")
+    public void the_admin_clicks_the_cancel_button() {
+        categoriesPage.clickCancelButton();
+    }
+
+    @Then("the admin should be redirected to the Categories page")
+    public void the_admin_should_be_redirected_to_the_categories_page() {
+        Assert.assertTrue(
+                "Admin was NOT redirected to Categories page",
+                categoriesPage.isCategoriesPageElementsVisible()
+        );
+    }
+
+
 
 }

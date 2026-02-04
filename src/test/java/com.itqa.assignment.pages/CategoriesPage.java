@@ -498,5 +498,94 @@ public class CategoriesPage {
         return true;
     }
 
+    private final By addCategoryHeader = By.xpath("//h3");
+
+    public void clickAddCategoryButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(addCategoryBtn)).click();
+    }
+
+    public boolean isAddCategoryPageDisplayed() {
+        return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(addCategoryHeader)
+        ).isDisplayed();
+    }
+
+    private final By addCategorySaveBtn = By.xpath("//button");
+    private final By validationMessages = By.xpath("//div[@class='invalid-feedback']");
+
+    public void clickSaveButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(addCategorySaveBtn)).click();
+        System.out.println("Clicked Save button");
+    }
+
+    public boolean isValidationMessageDisplayed(String expectedMessage) {
+
+        List<WebElement> messages = wait.until(
+                ExpectedConditions.visibilityOfAllElementsLocatedBy(validationMessages)
+        );
+
+        System.out.println("Validation messages displayed:");
+
+        for (WebElement message : messages) {
+            String actualText = message.getText().trim();
+            System.out.println(actualText);
+
+            if (actualText.contains(expectedMessage)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private final By cancelBtn = By.xpath("//a[@class='btn btn-secondary']");
+
+    public void clickCancelButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(cancelBtn)).click();
+        System.out.println("Clicked Cancel button");
+    }
+
+    public boolean isCategoriesPageElementsVisible() {
+
+        boolean headerVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(header)
+        ).isDisplayed();
+
+        boolean searchInputVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchInput)
+        ).isDisplayed();
+
+        boolean dropdownVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(categoryDropdown)
+        ).isDisplayed();
+
+        boolean searchBtnVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchBtn)
+        ).isDisplayed();
+
+        boolean resetBtnVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(resetBtn)
+        ).isDisplayed();
+
+        boolean addBtnVisible = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(addCategoryBtn)
+        ).isDisplayed();
+
+        System.out.println("Categories page elements visibility:");
+        System.out.println("Header: " + headerVisible);
+        System.out.println("Search input: " + searchInputVisible);
+        System.out.println("Dropdown: " + dropdownVisible);
+        System.out.println("Search button: " + searchBtnVisible);
+        System.out.println("Reset button: " + resetBtnVisible);
+        System.out.println("Add Category button: " + addBtnVisible);
+
+        return headerVisible
+                && searchInputVisible
+                && dropdownVisible
+                && searchBtnVisible
+                && resetBtnVisible
+                && addBtnVisible;
+    }
+
 
 }

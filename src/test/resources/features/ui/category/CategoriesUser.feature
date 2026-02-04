@@ -29,7 +29,7 @@ Feature: Category Management - Standard User
     And the user clicks the Search button
     Then "No category found" message should be displayed
 
-#//pramesh
+#//----pramesh
 
   Scenario: View category list as user
     Given the user is logged into the system

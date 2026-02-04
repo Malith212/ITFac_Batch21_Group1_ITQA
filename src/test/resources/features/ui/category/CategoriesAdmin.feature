@@ -35,3 +35,41 @@ Feature: Category Management - Admin
     And the admin clicks the delete button
     Then the category should be deleted successfully
     And success message should be displayed
+
+#  //----pramesh
+
+  Scenario: Open Add Category page
+    And the admin is on the Categories page
+    When the admin clicks the Add Category button
+    Then the Add Category page should be displayed
+
+#  Scenario: Add main category
+#    When the admin clicks the Add Category button
+#    And the admin enters a valid category name
+#    And the admin leaves the parent category empty
+#    And the admin clicks the Save button
+#    Then the category should be created successfully
+#    And the new category should appear in the category list
+#
+#
+#  Scenario: Add sub-category
+#    When the admin clicks the Add Category button
+#    And the admin enters a valid category name
+#    And the admin selects a parent category
+#    And the admin clicks the Save button
+#    Then the sub-category should be created successfully
+#    And the selected parent category should be displayed
+
+  Scenario: Category name required validation
+    And the admin is on the Categories page
+    When the admin clicks the Add Category button
+    And the admin clicks the Save button
+    Then an error message "Category name is required" should be displayed
+    And an error message "Category name must be between 3 and 10 characters" should be displayed
+
+
+  Scenario: Cancel add category
+    And the admin is on the Categories page
+    When the admin clicks the Add Category button
+    And the admin clicks the Cancel button
+    Then the admin should be redirected to the Categories page
