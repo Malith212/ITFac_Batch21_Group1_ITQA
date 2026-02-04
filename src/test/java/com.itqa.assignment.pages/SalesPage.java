@@ -29,7 +29,6 @@ public class SalesPage {
 
     // Dropdown
     private final By plantDropdown = By.id("plantId");
-
     private final By quantityInput = By.id("quantity");
 
 
@@ -113,13 +112,10 @@ public class SalesPage {
 
         for (WebElement option : options) {
             String text = option.getText();
-
             if (text.contains("Select Plant")) {
                 continue;
             }
-
             int stock = Integer.parseInt(text.replaceAll("[^0-9]", ""));
-
             if (stock <= 0) {
                 return false;
             }
@@ -199,19 +195,13 @@ public class SalesPage {
         } catch (Exception ignored) {
             // ignore if alert not present or already handled
         }
-
-        // Optionally, wait for the row to be removed
         wait.until(ExpectedConditions.stalenessOf(latest));
     }
 
     public int getPlantStockFromPlantsTableByName(String plantName) {
 
         WebDriverWait wait = NavigationHelper.getWait();
-
-        // Table elements
-        WebElement table = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table"))
-        );
+        WebElement table = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table")));
 
         // ===== FIND HEADER INDEXES =====
         List<WebElement> headers = table.findElements(By.cssSelector("thead tr th"));
@@ -221,16 +211,13 @@ public class SalesPage {
 
         for (int i = 0; i < headers.size(); i++) {
             String headerText = headers.get(i).getText().trim();
-
             headerText = headerText.toLowerCase();
-
             if (headerText.contains("name")) {
                 nameColIndex = i;
             }
             if (headerText.contains("stock")) {
                 stockColIndex = i;
             }
-
         }
 
         if (nameColIndex == -1 || stockColIndex == -1) {
@@ -250,7 +237,6 @@ public class SalesPage {
                 return Integer.parseInt(stockText.replaceAll("[^0-9]", ""));
             }
         }
-
         throw new AssertionError(
                 "Plant with name '" + plantName + "' not found in Plants table."
         );
@@ -338,7 +324,6 @@ public class SalesPage {
                 break;
             }
         }
-
         // Check if sorted descending (Z-A)
         boolean descending = true;
         for (int i = 0; i < values.size() - 1; i++) {
@@ -363,7 +348,6 @@ public class SalesPage {
                 numbers.add(Double.parseDouble(numStr));
             }
         }
-
         if (numbers.size() < 2) return true;
 
         // Check if sorted ascending
@@ -383,7 +367,6 @@ public class SalesPage {
                 break;
             }
         }
-
         return ascending || descending;
     }
 
@@ -402,7 +385,6 @@ public class SalesPage {
         }
 
         if (columnIndex == -1) return values;
-
         // Get values from that column
         try {
             WebElement tbody = wait.until(ExpectedConditions.visibilityOfElementLocated(salesTableTbody));
@@ -439,15 +421,12 @@ public class SalesPage {
             for (WebElement row : rows) {
                 WebElement deleteBtn = row.findElement(deleteBtnIcon);
                 deleteBtn.click();
-
                 try {
                     wait.until(ExpectedConditions.alertIsPresent());
                     Driver.getDriver().switchTo().alert().accept();
                 } catch (Exception ignored) {
                     // ignore if alert not present or already handled
                 }
-
-                // Wait for the row to be removed
                 wait.until(ExpectedConditions.stalenessOf(row));
             }
         } catch (Exception e) {
