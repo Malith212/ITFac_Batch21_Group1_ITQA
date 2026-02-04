@@ -1,0 +1,10 @@
+@api @user @mvp
+Feature: Dashboard API Validation (User)
+
+  @SeedDashboardTests
+  Scenario: TC_DSH_USR_06 - Verify authenticated User can fetch Category Summary
+    Given user auth token is set
+    When the user sends a GET request to retrieve the Category Summary from "/categories/summary"
+    Then the response status code should be 200
+    And the response should contain "mainCategories" with value 1
+    And the response should contain "subCategories" with value 2
