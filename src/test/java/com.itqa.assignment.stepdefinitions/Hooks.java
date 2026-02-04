@@ -6,11 +6,14 @@ import com.itqa.assignment.utilities.Driver;
 
 public class Hooks {
 
-    @Before("@ui") // Only runs for scenarios tagged with @ui
+    // --- BROWSER SETUP (runs for all @ui scenarios) ---
+    @Before(value = "@ui", order = 4)
     public void setUpUI() {
         Driver.getDriver();
     }
 
+
+    // --- BROWSER TEARDOWN ---
     @After("@ui")
     public void tearDownUI() {
         Driver.closeDriver();
