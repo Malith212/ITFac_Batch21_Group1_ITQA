@@ -1,7 +1,7 @@
 @ui @admin
 Feature: Category Management - Admin
 
-  Scenario: View category list
+  Scenario: TC_CAT_ADM_01 - View category list
     And the admin is on the Categories page
     Then the categories page should be displayed
     And the Categories header should be visible
@@ -12,26 +12,26 @@ Feature: Category Management - Admin
     And category table should display ID, Name, Parent, Actions columns
 
   @SeedCategorySortTest
-  Scenario: Sort categories by ID
+  Scenario: TC_CAT_ADM_02 - Sort categories by ID
     And the admin is on the Categories page
     When the admin clicks on the ID column header
     Then the sorting indicator should appear on the ID column
     And categories should be sorted by ID
 
   @SeedCategorySortTest
-  Scenario: Sort categories by Name
+  Scenario: TC_CAT_ADM_03 - Sort categories by Name
     And the admin is on the Categories page
     When the admin clicks on the Name column header
     Then the sorting indicator should appear on the Name column
     And categories should be sorted alphabetically by name
 
-  Scenario: Search category by valid name
+  Scenario: TC_CAT_ADM_04 - Search category by valid name
     And the admin is on the Categories page
     When the admin enters a valid category name in search field
     And the admin clicks the Search button
     Then matching category records should be displayed
 
-  Scenario: Delete Category
+  Scenario: TC_CAT_ADM_05 - Delete Category
     And the admin is on the Categories page
     When the admin searches for a category record
     And the admin clicks the delete button
@@ -40,12 +40,12 @@ Feature: Category Management - Admin
 
 #  //----pramesh
 
-  Scenario: Open Add Category page
+  Scenario: TC_CAT_ADM_11 - Open Add Category page
     And the admin is on the Categories page
     When the admin clicks the Add Category button
     Then the Add Category page should be displayed
 
-  Scenario: Add main category
+  Scenario: TC_CAT_ADM_12 - Add main category
     And the admin is on the Categories page
     When the admin clicks the Add Category button
     And the admin enters a valid category name
@@ -57,7 +57,7 @@ Feature: Category Management - Admin
     Then the created category should be removed from the list
 
 
-  Scenario: Add sub-category
+  Scenario: TC_CAT_ADM_13 - Add sub-category
     # First create a main category
     And the admin is on the Categories page
     When the admin clicks the Add Category button
@@ -79,7 +79,7 @@ Feature: Category Management - Admin
     When the admin deletes the created main category from UI
     Then the main category should be removed from the list
 
-  Scenario: Category name required validation
+  Scenario: TC_CAT_ADM_14 - Category name required validation
     And the admin is on the Categories page
     When the admin clicks the Add Category button
     And the admin clicks the Save button on category page
@@ -87,7 +87,7 @@ Feature: Category Management - Admin
     And an error message "Category name must be between 3 and 10 characters" should be displayed
 
 
-  Scenario: Cancel add category
+  Scenario: TC_CAT_ADM_15 - Cancel add category
     And the admin is on the Categories page
     When the admin clicks the Add Category button
     And the admin clicks the Cancel button
