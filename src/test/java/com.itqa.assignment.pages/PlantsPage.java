@@ -36,7 +36,6 @@ public class PlantsPage {
     private final By searchField = By.cssSelector("input[name='name']");
     private final By searchButton = By.cssSelector("form button.btn-primary");
     private final By plantRowNames = By.cssSelector("table.table tbody tr td:first-child");
-
     // Locators for sorting functionality
     private final By nameColumnHeader = By.cssSelector("table.table thead th a[href*='sortField=name']");
     private final By nameColumnHeaderCell = By.xpath("//table[contains(@class,'table')]//thead//th[contains(.,'Name')]");
@@ -148,7 +147,7 @@ public class PlantsPage {
         Select categorySelect = new Select(Driver.getDriver().findElement(categoryField));
         categorySelect.selectByIndex(0);
     }
-
+  
     public boolean isQuantityErrorDisplayed() {
         try {
             WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
@@ -171,6 +170,12 @@ public class PlantsPage {
         try {
             NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryErrorMessage));
             return Driver.getDriver().findElement(categoryErrorMessage).isDisplayed();
+    // ==================== Plant List Page Methods ====================
+
+    public boolean isPlantListDisplayed() {
+        try {
+            WebElement table = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+            return table.isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -298,6 +303,38 @@ public class PlantsPage {
     public boolean categoryDropdownDoesNotContainAsSelectable(String categoryName) {
         try {
             WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryField));
+            Select select = new Select(dropdown);
+            List<WebElement> options = select.getOptions();
+            for (WebElement option : options) {
+                if (option.getText().contains(categoryName) && option.isEnabled()) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    // ==================== Search Functionality Methods ====================
+
+    public void enterSearchKeyword(String keyword) {
+        WebElement search = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(searchField));
+        search.clear();
+        search.sendKeys(keyword);
+    }
+
+    public void clickSearchButton() {
+        WebElement search = NavigationHelper.getWait().until(ExpectedConditions.elementToBeClickable(searchButton));
+        search.click();
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+    }
+
+    }
+
+    public boolean categoryDropdownDoesNotContainAsSelectable(String categoryName) {
+        try {
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
             Select select = new Select(dropdown);
             List<WebElement> options = select.getOptions();
             for (WebElement option : options) {
