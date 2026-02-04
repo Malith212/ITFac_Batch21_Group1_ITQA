@@ -219,6 +219,23 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isNoCategoryMessageDisplayed(message));
     }
 
+    //pramesh - user
+
+    @Then("the Categories page should be displayed")
+    public void the_categories_page_should_be_displayed_user() {
+        Assert.assertTrue(categoriesPage.isCategoriesPageDisplayed());
+    }
+
+    @And("the category list should be displayed in read-only mode")
+    public void the_category_list_should_be_displayed_in_read_only_mode() {
+
+        Assert.assertTrue(categoriesPage.isCategoryListVisible());
+        Assert.assertTrue(categoriesPage.isCategoryListReadOnly());
+    }
+
+
+
+
 
 
 }

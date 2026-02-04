@@ -402,6 +402,26 @@ public class CategoriesPage {
         }
     }
 
+    //pramesh - user
+
+// ------------------------
+// --- USER READ ONLY CHECK ---
+// ------------------------
+
+    public boolean isCategoryListVisible() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(allNames)).isDisplayed();
+    }
+
+    public boolean isCategoryListReadOnly() {
+
+        boolean addHidden = isAddCategoryButtonNotVisible();
+        boolean editHidden = isEditActionHiddenOrDisabled();
+        boolean deleteHidden = isDeleteActionHiddenOrDisabled();
+
+        return addHidden && editHidden && deleteHidden;
+    }
+
+
 
 
 }

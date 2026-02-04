@@ -28,3 +28,39 @@ Feature: Category Management - Standard User
     When the user enters an invalid category name in search field
     And the user clicks the Search button
     Then "No category found" message should be displayed
+
+#//pramesh
+
+  Scenario: View category list as user
+    Given the user is logged into the system
+    And the user is on the Categories page
+    Then the Categories page should be displayed
+    And the category list should be displayed in read-only mode
+#
+#  Scenario: Search category as user
+#    Given the user is logged into the system
+#    And the user is on the Categories page
+#    When the user enters a category name in the search field
+#    And the user clicks the Search button
+#    Then matching categories should be displayed
+#
+#  Scenario: Sort categories by ID
+#    Given the user is logged into the system
+#    And the user is on the Categories page
+#    When the user clicks on the ID column header
+#    Then the sorting indicator should appear on the ID column
+#    And categories should be sorted by ID
+#
+#  Scenario: Sort categories by name
+#    Given the user is logged into the system
+#    And the user is on the Categories page
+#    When the user clicks on the Name column header
+#    Then the sorting indicator should appear on the Name column
+#    And categories should be sorted alphabetically by name
+#
+#  Scenario: Sort categories by parent
+#    Given the user is logged into the system
+#    And the user is on the Categories page
+#    When the user clicks on the Parent column header
+#    Then the sorting indicator should appear on the Parent column
+#    And categories should be sorted based on parent category
