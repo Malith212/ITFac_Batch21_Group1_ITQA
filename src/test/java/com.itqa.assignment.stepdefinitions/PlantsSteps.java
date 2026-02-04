@@ -72,12 +72,6 @@ public class PlantsSteps {
                 actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()));
     }
 
-    @Then("the Price field should remain blank")
-    public void the_price_field_should_remain_blank() {
-        Assert.assertTrue("Price field should be empty",
-                plantPage.isPriceFieldEmpty());
-    }
-
     // Quantity field step definitions
     @When("the admin enters a negative number in the Quantity field")
     public void the_admin_enters_a_negative_number_in_the_quantity_field() {
@@ -142,69 +136,29 @@ public class PlantsSteps {
                 plantPage.isActionsColumnVisible());
     }
 
-    // ==================== Category Management Step Definitions (TC_PLT_ADM_02) ====================
+    // ==================== Category Dropdown Verification Step Definitions (TC_PLT_ADM_02) ====================
 
-    @When("the admin clicks the Add Category button")
-    public void the_admin_clicks_the_add_category_button() {
-        plantPage.clickAddCategoryButton();
-    }
-
-    @And("the admin enters category name {string}")
-    public void the_admin_enters_category_name(String categoryName) {
-        plantPage.enterCategoryName(categoryName);
-    }
-
-    @And("the admin leaves the parent category empty")
-    public void the_admin_leaves_the_parent_category_empty() {
-        plantPage.leaveParentCategoryEmpty();
-    }
-
-    @And("the admin selects {string} as parent category")
-    public void the_admin_selects_as_parent_category(String parentCategoryName) {
-        plantPage.selectParentCategory(parentCategoryName);
-    }
-
-    @And("the admin clicks the Save Category button")
-    public void the_admin_clicks_the_save_category_button() {
-        plantPage.clickSaveCategoryButton();
-    }
-
-    @Then("the category {string} should be visible in the categories list")
-    public void the_category_should_be_visible_in_the_categories_list(String categoryName) {
-        Assert.assertTrue("Category '" + categoryName + "' should be visible in the list",
-                plantPage.isCategoryVisibleInList(categoryName));
-    }
-
-    @And("the admin deletes category {string}")
-    public void the_admin_deletes_category(String categoryName) {
-        plantPage.deleteCategory(categoryName);
-    }
-
-    // Category dropdown verification in Add Plant page
     @Then("the Category dropdown should be visible in Add Plant page")
     public void the_category_dropdown_should_be_visible_in_add_plant_page() {
         Assert.assertTrue("Category dropdown should be visible in Add Plant page",
                 plantPage.isCategoryDropdownVisibleInAddPlant());
     }
 
-    @Then("the Category dropdown should contain {string} as selectable option")
-    public void the_category_dropdown_should_contain_as_selectable_option(String categoryName) {
-        Assert.assertTrue("Category dropdown should contain '" + categoryName + "' as selectable option",
-                plantPage.categoryDropdownContainsAsSelectable(categoryName));
+    @Then("the Category dropdown should contain the created sub-category as selectable option")
+    public void the_category_dropdown_should_contain_the_created_sub_category_as_selectable_option() {
+        String subCatName = PlantsHooks.getCategoryDropdownSubCatName();
+        Assert.assertTrue("Category dropdown should contain '" + subCatName + "' as selectable option",
+                plantPage.categoryDropdownContainsAsSelectable(subCatName));
     }
 
-    @Then("the Category dropdown should not contain {string} as selectable option")
-    public void the_category_dropdown_should_not_contain_as_selectable_option(String categoryName) {
-        Assert.assertTrue("Category dropdown should not contain '" + categoryName + "' as selectable option",
-                plantPage.categoryDropdownDoesNotContainAsSelectable(categoryName));
+    @Then("the Category dropdown should not contain the created main category as selectable option")
+    public void the_category_dropdown_should_not_contain_the_created_main_category_as_selectable_option() {
+        String mainCatName = PlantsHooks.getCategoryDropdownMainCatName();
+        Assert.assertTrue("Category dropdown should not contain '" + mainCatName + "' as selectable option",
+                plantPage.categoryDropdownDoesNotContainAsSelectable(mainCatName));
     }
 
     // ==================== Search Functionality Step Definitions (TC_PLT_USR_02) ====================
-
-    @When("the user enters {string} in the search field")
-    public void the_user_enters_in_the_search_field(String keyword) {
-        plantPage.enterSearchKeyword(keyword);
-    }
 
     @When("the user enters the created plant name in the search field")
     public void the_user_enters_the_created_plant_name_in_the_search_field() {
@@ -226,7 +180,6 @@ public class PlantsSteps {
 
     @Then("the page should refresh or grid should update")
     public void the_page_should_refresh_or_grid_should_update() {
-        // Verify we're still on the plants page (page refreshed with results)
         Assert.assertTrue("Should be on the plants page after search",
                 plantPage.isPlantListDisplayed());
     }
@@ -245,16 +198,42 @@ public class PlantsSteps {
                 plantPage.isPlantDisplayedInResults(plantName));
     }
 
-    @When("the user enters a non-existent plant name {string} in the search field")
-    public void the_user_enters_a_non_existent_plant_name_in_the_search_field(String keyword) {
-        plantPage.enterSearchKeyword(keyword);
+    // ==================== Sorting Functionality Step Definitions (TC_PLT_USR_05) ====================
+
+    @Then("the Name column header should be clickable")
+    public void the_name_column_header_should_be_clickable() {
+        Assert.assertTrue("Name column header should be clickable",
+                plantPage.isNameColumnHeaderClickable());
     }
 
-    @Then("the {string} message should be displayed")
-    public void the_message_should_be_displayed(String expectedMessage) {
-        if (expectedMessage.equals("No plants found")) {
-            Assert.assertTrue("'No plants found' message should be displayed",
-                    plantPage.isNoPlantsFoundMessageDisplayed());
-        }
+    @When("the user clicks on the Name column header")
+    public void the_user_clicks_on_the_name_column_header() {
+        plantPage.clickNameColumnHeader();
+    }
+
+    @Then("the sort indicator should appear or toggle")
+    public void the_sort_indicator_should_appear_or_toggle() {
+        Assert.assertTrue("Sort indicator (arrow) should be displayed",
+                plantPage.isSortIndicatorDisplayed());
+    }
+
+    @Then("the plant list should be sorted alphabetically")
+    public void the_plant_list_should_be_sorted_alphabetically() {
+        String sortDirection = plantPage.getCurrentSortDirection();
+        boolean ascending = sortDirection.equals("ascending");
+        Assert.assertTrue("Plant list should be sorted alphabetically (" + sortDirection + ")",
+                plantPage.isPlantListSortedAlphabetically(ascending));
+    }
+
+    @Then("the plant list should be sorted in ascending order")
+    public void the_plant_list_should_be_sorted_in_ascending_order() {
+        Assert.assertTrue("Plant list should be sorted in ascending order (A-Z)",
+                plantPage.isPlantListSortedAlphabetically(true));
+    }
+
+    @Then("the plant list should be sorted in descending order")
+    public void the_plant_list_should_be_sorted_in_descending_order() {
+        Assert.assertTrue("Plant list should be sorted in descending order (Z-A)",
+                plantPage.isPlantListSortedAlphabetically(false));
     }
 }
