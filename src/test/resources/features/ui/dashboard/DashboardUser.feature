@@ -1,5 +1,8 @@
-@ui @user
+@ui
 Feature: Dashboard Functionality
+
+  Background:
+    Given the user is logged into the system
 
   Scenario: TC_DSH_USR_01 - Verify the "Manage Plants" button redirects to the Plants page
     Given the user is on the "Dashboard" page
