@@ -16,11 +16,12 @@ public class PlantsPage {
     private final By plantNameField = By.id("name");
     private final By priceField = By.id("price");
     private final By quantityField = By.id("quantity");
+    private final By categoryField = By.id("categoryId");
     private final By saveBtn = By.cssSelector("button.btn-primary");
     private final By plantNameErrorMessage = By.cssSelector("#name + .text-danger");
     private final By priceErrorMessage = By.cssSelector("#price + .text-danger");
     private final By quantityErrorMessage = By.cssSelector("#quantity + .text-danger");
-    private final By categoryDropdownInAddPlant = By.id("categoryId");
+    private final By categoryErrorMessage = By.cssSelector("#categoryId + .text-danger");
 
     // Locators for plant list page
     private final By plantTable = By.cssSelector("table.table");
@@ -35,7 +36,6 @@ public class PlantsPage {
     private final By searchField = By.cssSelector("input[name='name']");
     private final By searchButton = By.cssSelector("form button.btn-primary");
     private final By plantRowNames = By.cssSelector("table.table tbody tr td:first-child");
-
     // Locators for sorting functionality
     private final By nameColumnHeader = By.cssSelector("table.table thead th a[href*='sortField=name']");
     private final By nameColumnHeaderCell = By.xpath("//table[contains(@class,'table')]//thead//th[contains(.,'Name')]");
@@ -137,6 +137,17 @@ public class PlantsPage {
         quantityInput.sendKeys("-1");
     }
 
+    public void leaveQuantityFieldEmpty() {
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityField));
+        Driver.getDriver().findElement(quantityField).clear();
+    }
+
+    public void leaveCategoryFieldEmpty() {
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryField));
+        Select categorySelect = new Select(Driver.getDriver().findElement(categoryField));
+        categorySelect.selectByIndex(0);
+    }
+  
     public boolean isQuantityErrorDisplayed() {
         try {
             WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
@@ -150,6 +161,30 @@ public class PlantsPage {
         try {
             WebElement errorElement = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(quantityErrorMessage));
             return errorElement.getText();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public boolean isCategoryErrorDisplayed() {
+        try {
+            NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryErrorMessage));
+            return Driver.getDriver().findElement(categoryErrorMessage).isDisplayed();
+    // ==================== Plant List Page Methods ====================
+
+    public boolean isPlantListDisplayed() {
+        try {
+            WebElement table = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+            return table.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getCategoryErrorMessage() {
+        try {
+            NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryErrorMessage));
+            return Driver.getDriver().findElement(categoryErrorMessage).getText();
         } catch (Exception e) {
             return "";
         }
@@ -242,7 +277,7 @@ public class PlantsPage {
 
     public boolean isCategoryDropdownVisibleInAddPlant() {
         try {
-            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryField));
             return dropdown.isDisplayed();
         } catch (Exception e) {
             return false;
@@ -251,7 +286,7 @@ public class PlantsPage {
 
     public boolean categoryDropdownContainsAsSelectable(String categoryName) {
         try {
-            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryDropdownInAddPlant));
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryField));
             Select select = new Select(dropdown);
             List<WebElement> options = select.getOptions();
             for (WebElement option : options) {
@@ -263,6 +298,38 @@ public class PlantsPage {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public boolean categoryDropdownDoesNotContainAsSelectable(String categoryName) {
+        try {
+            WebElement dropdown = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(categoryField));
+            Select select = new Select(dropdown);
+            List<WebElement> options = select.getOptions();
+            for (WebElement option : options) {
+                if (option.getText().contains(categoryName) && option.isEnabled()) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    // ==================== Search Functionality Methods ====================
+
+    public void enterSearchKeyword(String keyword) {
+        WebElement search = NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(searchField));
+        search.clear();
+        search.sendKeys(keyword);
+    }
+
+    public void clickSearchButton() {
+        WebElement search = NavigationHelper.getWait().until(ExpectedConditions.elementToBeClickable(searchButton));
+        search.click();
+        NavigationHelper.getWait().until(ExpectedConditions.visibilityOfElementLocated(plantTable));
+    }
+
     }
 
     public boolean categoryDropdownDoesNotContainAsSelectable(String categoryName) {

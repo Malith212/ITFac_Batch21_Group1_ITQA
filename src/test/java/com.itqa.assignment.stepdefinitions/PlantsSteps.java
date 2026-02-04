@@ -78,6 +78,16 @@ public class PlantsSteps {
         plantPage.enterNegativeQuantity();
     }
 
+    @When("the admin leaves the Quantity field empty")
+    public void the_admin_leaves_the_quantity_field_empty() {
+        plantPage.leaveQuantityFieldEmpty();
+    }
+
+    @When("the admin leaves the Category field in default or empty state")
+    public void the_admin_leaves_the_category_field_in_default_or_empty_state() {
+        plantPage.leaveCategoryFieldEmpty();
+    }
+
     @Then("the error message {string} should be displayed below the Quantity field")
     public void the_error_message_should_be_displayed_below_the_quantity_field(String expectedMessage) {
         // Verify error message is displayed
@@ -89,6 +99,19 @@ public class PlantsSteps {
         Assert.assertTrue("Error message should contain: " + expectedMessage + ", but was: " + actualMessage,
                 actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()));
     }
+
+    @Then("the error message {string} should be displayed below the Category field")
+    public void the_error_message_should_be_displayed_below_the_category_field(String expectedMessage) {
+        // Verify error message is displayed
+        Assert.assertTrue("Category error message should be displayed",
+                plantPage.isCategoryErrorDisplayed());
+
+        // Verify error message text
+        String actualMessage = plantPage.getCategoryErrorMessage();
+        Assert.assertTrue("Error message should contain: " + expectedMessage + ", but was: " + actualMessage,
+                actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()));
+    }
+
 
     // ==================== Plant List User View Step Definitions ====================
 

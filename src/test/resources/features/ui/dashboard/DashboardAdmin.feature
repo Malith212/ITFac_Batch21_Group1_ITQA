@@ -1,5 +1,8 @@
-@ui @admin
+@ui
 Feature: Dashboard Functionality
+
+  Background:
+    Given the admin is logged into the system
 
   Scenario Outline: TC_DSH_ADM_02 - Verify the navigation menu highlighting
     When the admin navigates to the "<Page>" page via sidebar
