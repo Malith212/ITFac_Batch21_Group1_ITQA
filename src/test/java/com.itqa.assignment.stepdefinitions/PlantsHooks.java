@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Hooks for Plant User test scenarios that require seeded test data.
  * Creates main category, sub-category and plant via API before tests,
- * and cleans up afterwards.
+ * and cleans up Afterward.
  */
 public class PlantsHooks {
 
