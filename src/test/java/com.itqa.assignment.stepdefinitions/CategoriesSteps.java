@@ -233,9 +233,38 @@ public class CategoriesSteps {
         Assert.assertTrue(categoriesPage.isCategoryListReadOnly());
     }
 
+    @When("the user enters a category name in the search field")
+    public void the_user_enters_a_category_name_in_the_search_field() {
+        categoriesPage.enterCategoryName("category 1");
+    }
 
 
 
+    @Then("matching category records be displayed")
+    public void matching_category_records_be_displayed() {
+        Assert.assertTrue(
+                "Category 'category 1' was NOT found in table",
+                categoriesPage.isCategoryPresentInTable("category 1")
+        );
+    }
+
+    @When("the user clicks on the Parent column header")
+    public void the_user_clicks_on_the_parent_column_header() {
+        categoriesPage.clickParentColumn();
+    }
+
+    @Then("the sorting indicator should appear on the Parent column")
+    public void the_sorting_indicator_should_appear_on_the_parent_column() {
+        Assert.assertTrue(categoriesPage.isParentSortIndicatorVisible());
+    }
+
+    @And("categories should be sorted based on parent category")
+    public void categories_should_be_sorted_based_on_parent_category() {
+        Assert.assertTrue(
+                "Categories are NOT sorted by parent category",
+                categoriesPage.areCategoriesSortedByParent()
+        );
+    }
 
 
 }

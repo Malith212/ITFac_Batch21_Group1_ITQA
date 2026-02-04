@@ -6,6 +6,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.Select;
+import java.util.Collections;
+
 
 
 import java.time.Duration;
@@ -422,6 +424,79 @@ public class CategoriesPage {
     }
 
 
+    public void enterCategoryName(String categoryName) {
+        WebElement input = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchInput)
+        );
+        input.clear();
+        input.sendKeys(categoryName);
+        System.out.println("Entered category name: " + categoryName);
+    }
+
+    public boolean isCategoryPresentInTable(String categoryName) {
+
+        // Wait until table cells are visible
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(tableCells));
+
+        List<WebElement> cells = Driver.getDriver().findElements(tableCells);
+
+        for (WebElement cell : cells) {
+            String text = cell.getText().trim();
+
+            if (text.equalsIgnoreCase(categoryName)) {
+                System.out.println("Category found in table: " + text);
+                return true;
+            }
+        }
+
+        System.out.println("Category NOT found in table: " + categoryName);
+        return false;
+    }
+
+    public void clickParentColumn() {
+        wait.until(ExpectedConditions.elementToBeClickable(parentColumn)).click();
+    }
+
+    private final By parentSortIndicator =
+            By.xpath("//th[3]//span");
+
+
+    public boolean isParentSortIndicatorVisible() {
+        return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(parentSortIndicator)
+        ).isDisplayed();
+    }
+
+    private final By parentColumnCells = By.xpath("//table/tbody/tr/td[3]");
+
+    public boolean areCategoriesSortedByParent() {
+
+        wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(parentColumnCells));
+
+        List<WebElement> cells = Driver.getDriver().findElements(parentColumnCells);
+
+        List<String> parents = new ArrayList<>();
+
+        for (WebElement cell : cells) {
+            String text = cell.getText().trim();
+
+            // Ignore rows with no parent ("-")
+            if (!text.equals("-")) {
+                parents.add(text);
+            }
+        }
+
+        System.out.println("Filtered parent values (ignoring '-'): " + parents);
+
+        // Check list is sorted
+        for (int i = 0; i < parents.size() - 1; i++) {
+            if (parents.get(i).compareToIgnoreCase(parents.get(i + 1)) > 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
 
 }
