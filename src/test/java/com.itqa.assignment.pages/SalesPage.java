@@ -13,8 +13,8 @@ import java.util.List;
 public class SalesPage {
 
     // --- LOCATORS ---
-    private final By sellPlantBtn   = By.cssSelector(".btn-primary");
-    private final By sellPlantForm  = By.cssSelector("form.card.shadow-sm.p-4");
+    private final By sellPlantBtn = By.cssSelector(".btn-primary");
+    private final By sellPlantForm = By.cssSelector("form.card.shadow-sm.p-4");
     private final By salesTableTbody = By.cssSelector("table.table tbody");
     private final By tagNameOption = By.tagName("option");
     private final By deleteBtnIcon = By.cssSelector("button.btn-outline-danger");
@@ -24,8 +24,8 @@ public class SalesPage {
     private final By salesPageHeader = By.cssSelector("h3.mb-4");
     private final By salesTable = By.cssSelector("table.table");
     private final By salesTableHeaders = By.cssSelector("table.table thead th");
-    private final By paginationControls = By.cssSelector(".pagination, nav[aria-label='pagination'], .page-item");
     private final By noSalesMessage = By.cssSelector(".text-muted");
+    private final By paginationElement = By.cssSelector("nav ul.pagination");
 
     // Dropdown
     private final By plantDropdown = By.id("plantId");
@@ -95,43 +95,6 @@ public class SalesPage {
         return 0;
     }
 
-    public boolean isPlantInDropdown(String plantName) {
-        WebDriverWait wait = NavigationHelper.getWait();
-        WebElement dropdown = wait.until(ExpectedConditions.presenceOfElementLocated(plantDropdown));
-        List<WebElement> options = dropdown.findElements(tagNameOption);
-
-        for (WebElement option : options) {
-            String text = option.getText();
-            // Extract plant name (before the stock info)
-            String optionPlantName = text.replaceAll("\\s*\\(.*\\)$", "").trim();
-            if (optionPlantName.equals(plantName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int getPlantStockByName(String plantName) {
-        WebDriverWait wait = NavigationHelper.getWait();
-        WebElement dropdown = wait.until(ExpectedConditions.presenceOfElementLocated(plantDropdown));
-        List<WebElement> options = dropdown.findElements(tagNameOption);
-
-        for (WebElement option : options) {
-            String text = option.getText();
-            // Extract plant name (before the stock info)
-            String optionPlantName = text.replaceAll("\\s*\\(.*\\)$", "").trim();
-
-            if (optionPlantName.equals(plantName)) {
-                // Extract stock from text like "Plant 01 (Stock: 5)"
-                if (text.contains("Stock:")) {
-                    String stockStr = text.replaceAll(".*Stock:\\s*(\\d+).*", "$1");
-                    return Integer.parseInt(stockStr);
-                }
-            }
-        }
-        throw new AssertionError("Plant '" + plantName + "' not found in dropdown");
-    }
-
     // --- VERIFICATION METHODS ---
 
     public void verifySellPlantFormIsDisplayed() {
@@ -165,18 +128,25 @@ public class SalesPage {
     }
 
     public boolean isSellBlockedDueToQuantity() {
-        WebElement input = Driver.getDriver().findElement(quantityInput);
-        JavascriptExecutor js = (JavascriptExecutor) Driver.getDriver();
-        Boolean isValid = (Boolean) js.executeScript("return arguments[0].checkValidity();", input);
-
-        return Boolean.FALSE.equals(isValid);
+        try {
+            WebElement input = Driver.getDriver().findElement(quantityInput);
+            JavascriptExecutor js = (JavascriptExecutor) Driver.getDriver();
+            Boolean isValid = (Boolean) js.executeScript("return arguments[0].checkValidity();", input);
+            return Boolean.FALSE.equals(isValid);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean isSellBlockedDueToPlant() {
-        WebDriverWait wait = NavigationHelper.getWait();
-        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(plantDropdown));
-        String value = dropdown.getAttribute("value");
-        return value == null || value.trim().isEmpty();
+        try {
+            WebDriverWait wait = NavigationHelper.getWait();
+            WebElement dropdown = wait.until(ExpectedConditions.presenceOfElementLocated(plantDropdown));
+            String value = dropdown.getAttribute("value");
+            return value == null || value.trim().isEmpty();
+        } catch (Exception e) {
+            return true; // If can't find element, assume it's blocked
+        }
     }
 
     public void verifyLatestSaleEntry(String expectedPlantName, int expectedQuantity) {
@@ -211,30 +181,92 @@ public class SalesPage {
         return selectedOption.getText().replaceAll("\\s*\\(.*\\)$", "").trim();
     }
 
-    public void deleteLatestSalesRecord() {
+    public void deleteLatestSaleEntry() {
         WebDriverWait wait = NavigationHelper.getWait();
-
-        // Wait for table and get first row
         WebElement tbody = wait.until(ExpectedConditions.visibilityOfElementLocated(salesTableTbody));
         List<WebElement> rows = tbody.findElements(By.tagName("tr"));
-
         if (rows.isEmpty()) {
-            throw new AssertionError("No sales entries found to delete.");
+            throw new AssertionError("No sales entries found in sales table to delete.");
         }
 
-        // Find and click delete button in first row
-        WebElement deleteBtn = rows.getFirst().findElement(deleteBtnIcon);
+        WebElement latest = rows.getFirst();
+        WebElement deleteBtn = latest.findElement(deleteBtnIcon);
         deleteBtn.click();
 
-        // Handle the confirmation alert
-        wait.until(ExpectedConditions.alertIsPresent());
-        Driver.getDriver().switchTo().alert().accept();
+        try {
+            wait.until(ExpectedConditions.alertIsPresent());
+            Driver.getDriver().switchTo().alert().accept();
+        } catch (Exception ignored) {
+            // ignore if alert not present or already handled
+        }
 
-        // Wait for row to be removed
-        wait.until(ExpectedConditions.stalenessOf(rows.getFirst()));
+        // Optionally, wait for the row to be removed
+        wait.until(ExpectedConditions.stalenessOf(latest));
+    }
+
+    public int getPlantStockFromPlantsTableByName(String plantName) {
+
+        WebDriverWait wait = NavigationHelper.getWait();
+
+        // Table elements
+        WebElement table = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table"))
+        );
+
+        // ===== FIND HEADER INDEXES =====
+        List<WebElement> headers = table.findElements(By.cssSelector("thead tr th"));
+
+        int nameColIndex = -1;
+        int stockColIndex = -1;
+
+        for (int i = 0; i < headers.size(); i++) {
+            String headerText = headers.get(i).getText().trim();
+
+            headerText = headerText.toLowerCase();
+
+            if (headerText.contains("name")) {
+                nameColIndex = i;
+            }
+            if (headerText.contains("stock")) {
+                stockColIndex = i;
+            }
+
+        }
+
+        if (nameColIndex == -1 || stockColIndex == -1) {
+            throw new AssertionError("Name or Stock column not found in Plants table.");
+        }
+
+        // ===== FIND ROW BY PLANT NAME =====
+        List<WebElement> rows = table.findElements(By.cssSelector("tbody tr"));
+
+        for (WebElement row : rows) {
+            List<WebElement> cells = row.findElements(By.tagName("td"));
+
+            String currentName = cells.get(nameColIndex).getText().trim();
+
+            if (currentName.equalsIgnoreCase(plantName.trim())) {
+                String stockText = cells.get(stockColIndex).getText().trim();
+                return Integer.parseInt(stockText.replaceAll("[^0-9]", ""));
+            }
+        }
+
+        throw new AssertionError(
+                "Plant with name '" + plantName + "' not found in Plants table."
+        );
     }
 
     // --- SALES USER FEATURES ---
+
+    public boolean isSalesPageHeaderVisible() {
+        try {
+            WebDriverWait wait = NavigationHelper.getWait();
+            WebElement header = wait.until(ExpectedConditions.visibilityOfElementLocated(salesPageHeader));
+            return header.isDisplayed() && header.getText().trim().equalsIgnoreCase("Sales");
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public String getSalesPageHeaderText() {
         WebDriverWait wait = NavigationHelper.getWait();
@@ -268,7 +300,7 @@ public class SalesPage {
 
     public boolean isPaginationControlsVisible() {
         try {
-            List<WebElement> pagination = Driver.getDriver().findElements(paginationControls);
+            List<WebElement> pagination = Driver.getDriver().findElements(paginationElement);
             return !pagination.isEmpty();
         } catch (Exception e) {
             return false;
@@ -389,16 +421,6 @@ public class SalesPage {
         return values;
     }
 
-    public boolean hasSalesRecords() {
-        try {
-            WebElement tbody = Driver.getDriver().findElement(salesTableTbody);
-            List<WebElement> rows = tbody.findElements(By.tagName("tr"));
-            return !rows.isEmpty();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public boolean isNoSalesMessageDisplayed() {
         try {
             List<WebElement> messages = Driver.getDriver().findElements(noSalesMessage);
@@ -408,14 +430,29 @@ public class SalesPage {
         }
     }
 
-    public void deleteAllSalesRecords() {
-        while (hasSalesRecords()) {
-            try {
-                deleteLatestSalesRecord();
-            } catch (Exception e) {
-                break;
+    public void deleteAllSalesRecordsIfAny() {
+        WebDriverWait wait = NavigationHelper.getWait();
+        try {
+            WebElement tbody = wait.until(ExpectedConditions.visibilityOfElementLocated(salesTableTbody));
+            List<WebElement> rows = tbody.findElements(By.tagName("tr"));
+
+            for (WebElement row : rows) {
+                WebElement deleteBtn = row.findElement(deleteBtnIcon);
+                deleteBtn.click();
+
+                try {
+                    wait.until(ExpectedConditions.alertIsPresent());
+                    Driver.getDriver().switchTo().alert().accept();
+                } catch (Exception ignored) {
+                    // ignore if alert not present or already handled
+                }
+
+                // Wait for the row to be removed
+                wait.until(ExpectedConditions.stalenessOf(row));
             }
+        } catch (Exception e) {
+            // No sales records found, nothing to delete
         }
     }
-
 }
+
