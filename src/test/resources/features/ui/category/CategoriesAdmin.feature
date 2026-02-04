@@ -1,5 +1,8 @@
-@ui @admin
+@ui
 Feature: Category Management - Admin
+
+  Background:
+    Given the admin is logged into the system
 
   Scenario: TC_CAT_ADM_01 - View category list
     And the admin is on the Categories page

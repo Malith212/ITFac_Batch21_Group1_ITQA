@@ -181,20 +181,38 @@ public class CategoriesPage {
     /** Search for a category */
     public void searchCategory(String categoryName) {
 
-        // Wait until search input is visible
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
+        // Wait for any stale element to be refreshed by waiting for presence and then visibility
+        wait.until(ExpectedConditions.presenceOfElementLocated(searchInput));
 
-        // Wait until search input is clickable
-        wait.until(ExpectedConditions.elementToBeClickable(searchInput));
+        // Use a retry mechanism to handle StaleElementReferenceException
+        int maxRetries = 3;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                // Re-locate the element fresh each attempt to avoid stale reference
+                WebElement input = wait.until(ExpectedConditions.refreshed(
+                    ExpectedConditions.elementToBeClickable(searchInput)));
 
-        // Clear existing text safely
-        input.clear();
+                // Clear existing text safely
+                input.clear();
 
-        // Enter category name
-        input.sendKeys(categoryName);
+                // Enter category name
+                input.sendKeys(categoryName);
 
-        // Wait until text is actually entered into input field
-        wait.until(ExpectedConditions.attributeToBe(searchInput, "value", categoryName));
+                // Wait until text is actually entered into input field
+                wait.until(ExpectedConditions.attributeToBe(searchInput, "value", categoryName));
+
+                // If successful, break out of retry loop
+                break;
+            } catch (org.openqa.selenium.StaleElementReferenceException e) {
+                if (attempt == maxRetries - 1) {
+                    throw e; // Re-throw if all retries exhausted
+                }
+                // Use explicit wait instead of Thread.sleep - wait for element to become stale and then reappear
+                wait.until(ExpectedConditions.stalenessOf(
+                    Driver.getDriver().findElement(searchInput)));
+                wait.until(ExpectedConditions.presenceOfElementLocated(searchInput));
+            }
+        }
     }
 
 

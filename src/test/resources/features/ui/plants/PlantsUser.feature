@@ -1,5 +1,8 @@
-@ui @user
+@ui
 Feature: Plant Management User Functionality
+
+  Background:
+    Given the user is logged into the system
 
   @SeedPlantListTest
   Scenario: TC_PLT_USR_01 - Verify plant list visibility for user in plants page
