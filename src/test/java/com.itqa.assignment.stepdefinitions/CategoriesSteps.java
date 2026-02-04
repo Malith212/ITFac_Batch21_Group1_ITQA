@@ -77,7 +77,16 @@ public class CategoriesSteps {
 
     @And("categories should be sorted by ID")
     public void categories_should_be_sorted_by_id() {
-        Assert.assertEquals("1", categoriesPage.getFirstRowId());
+        List<String> ids = categoriesPage.getAllCategoryIds();
+        Assert.assertFalse("Category list should not be empty", ids.isEmpty());
+
+        // Verify IDs are sorted in ascending order
+        for (int i = 0; i < ids.size() - 1; i++) {
+            int currentId = Integer.parseInt(ids.get(i));
+            int nextId = Integer.parseInt(ids.get(i + 1));
+            Assert.assertTrue("Categories should be sorted by ID in ascending order. Found " + currentId + " before " + nextId,
+                    currentId <= nextId);
+        }
     }
 
     // ------------------------
@@ -159,13 +168,19 @@ public class CategoriesSteps {
         categoriesPage.visit();
     }
 
-    @When("the user selects a parent category from dropdown")
-    public void the_user_selects_a_parent_category_from_dropdown() {
+    @When("the user selects {string} category from dropdown")
+    public void the_user_selects_a_parent_category_from_dropdown(String categoryName) {
         // Print all options first
         List<String> options = categoriesPage.getParentDropdownOptions();
 
-        // Select "category 1"
-        categoriesPage.selectParentCategory("category 1");
+        // Select the specified category
+        categoriesPage.selectParentCategory(categoryName);
+    }
+
+    @When("the user selects the created parent category from dropdown")
+    public void the_user_selects_the_created_parent_category_from_dropdown() {
+        String parentCategoryName = CategoryHooks.getSortTestParentCategoryName();
+        categoriesPage.selectParentCategory(parentCategoryName);
     }
 
     @And("the user clicks the search button on category page")
@@ -173,12 +188,19 @@ public class CategoriesSteps {
         categoriesPage.clickSearchWithWaits();
     }
 
-    @Then("filtered categories should be displayed")
-    public void filtered_categories_should_be_displayed() {
+    @Then("filtered categories by main {string} category should be displayed")
+    public void filtered_categories_should_be_displayed(String categoryName) {
 
-        boolean isDisplayed = categoriesPage.isFilteredCategoryDisplayed("category 1");
+        boolean isDisplayed = categoriesPage.isFilteredCategoryDisplayed(categoryName);
 
         Assert.assertTrue(isDisplayed);
+    }
+
+    @Then("filtered categories by the created parent category should be displayed")
+    public void filtered_categories_by_the_created_parent_category_should_be_displayed() {
+        String parentCategoryName = CategoryHooks.getSortTestParentCategoryName();
+        boolean isDisplayed = categoriesPage.isFilteredCategoryDisplayed(parentCategoryName);
+        Assert.assertTrue("Categories filtered by '" + parentCategoryName + "' should be displayed", isDisplayed);
     }
 
     @Then("the Add Category button should not be visible")
@@ -238,13 +260,26 @@ public class CategoriesSteps {
         categoriesPage.enterCategoryName("category 1");
     }
 
-
+    @When("the user enters the created sub-category name in the search field")
+    public void the_user_enters_the_created_sub_category_name_in_the_search_field() {
+        String subCategoryName = CategoryHooks.getCreatedSubCategoryName();
+        categoriesPage.enterCategoryName(subCategoryName);
+    }
 
     @Then("matching category records be displayed")
     public void matching_category_records_be_displayed() {
         Assert.assertTrue(
                 "Category 'category 1' was NOT found in table",
                 categoriesPage.isCategoryPresentInTable("category 1")
+        );
+    }
+
+    @Then("the created sub-category should be displayed in the results")
+    public void the_created_sub_category_should_be_displayed_in_the_results() {
+        String subCategoryName = CategoryHooks.getCreatedSubCategoryName();
+        Assert.assertTrue(
+                "Category '" + subCategoryName + "' was NOT found in table",
+                categoriesPage.isCategoryPresentInTable(subCategoryName)
         );
     }
 

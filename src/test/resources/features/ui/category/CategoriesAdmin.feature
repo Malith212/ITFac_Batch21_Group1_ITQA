@@ -11,12 +11,14 @@ Feature: Category Management - Admin
     And add category button should be visible
     And category table should display ID, Name, Parent, Actions columns
 
+  @SeedCategorySortTest
   Scenario: Sort categories by ID
     And the admin is on the Categories page
     When the admin clicks on the ID column header
     Then the sorting indicator should appear on the ID column
     And categories should be sorted by ID
 
+  @SeedCategorySortTest
   Scenario: Sort categories by Name
     And the admin is on the Categories page
     When the admin clicks on the Name column header

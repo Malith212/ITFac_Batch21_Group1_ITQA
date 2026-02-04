@@ -52,6 +52,7 @@ public class CategoriesPage {
 
     // --- TABLE DATA ---
     private final By allNames = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
+    private final By allIds = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]");
     private final By firstRowId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]/td[1]");
     private final By searchResultRecord = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
     private final By deleteBtn = By.xpath("//button[@title='Delete']");
@@ -150,6 +151,16 @@ public class CategoriesPage {
         }
         System.out.println("All Names: " + names);
         return names;
+    }
+
+    /** Get all category IDs from the table */
+    public List<String> getAllCategoryIds() {
+        List<String> ids = new ArrayList<>();
+        for (WebElement element : Driver.getDriver().findElements(allIds)) {
+            ids.add(element.getText());
+        }
+        System.out.println("All IDs: " + ids);
+        return ids;
     }
 
     /** Get ID of the first row */
