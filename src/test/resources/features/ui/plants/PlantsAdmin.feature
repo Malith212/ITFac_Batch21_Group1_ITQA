@@ -1,5 +1,8 @@
-@ui @admin
+@ui
 Feature: Plant Management Admin Functionality
+
+  Background:
+    Given the admin is logged into the system
 
   Scenario: TC_PLT_ADM_01 - Verify that admin can navigate to plant page
     Given the admin navigates to the "plants" page via sidebar

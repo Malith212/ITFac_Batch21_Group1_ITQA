@@ -1,5 +1,8 @@
-@ui @user
+@ui
 Feature: Sales User Functionality
+
+  Background:
+    Given the user is logged into the system
 
   @SeedSalesUserTests
   Scenario: TC_SLS_USR_01 - Verify that user can view the Sales list page
