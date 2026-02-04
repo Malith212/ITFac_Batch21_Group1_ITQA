@@ -337,6 +337,127 @@ public class CategoriesSteps {
         );
     }
 
+    // ==================== Add Main Category Step Definitions ====================
 
+    // Store the generated category names for this test
+    private static String generatedCategoryName;
+    private static String generatedMainCategoryName;
+    private static String generatedSubCategoryName;
 
+    @And("the admin enters a valid category name")
+    public void the_admin_enters_a_valid_category_name() {
+        // Generate unique category name (3-10 characters)
+        String suffix = String.format("%03d", System.currentTimeMillis() % 1000);
+        generatedCategoryName = "AddM" + suffix;
+        categoriesPage.enterCategoryNameInAddForm(generatedCategoryName);
+    }
+
+    @And("the admin enters a valid main category name")
+    public void the_admin_enters_a_valid_main_category_name() {
+        // Generate unique main category name (3-10 characters)
+        String suffix = String.format("%03d", System.currentTimeMillis() % 1000);
+        generatedMainCategoryName = "Main" + suffix;
+        categoriesPage.enterCategoryNameInAddForm(generatedMainCategoryName);
+    }
+
+    @And("the admin enters a valid sub-category name")
+    public void the_admin_enters_a_valid_sub_category_name() {
+        // Generate unique sub-category name (3-10 characters)
+        String suffix = String.format("%03d", System.currentTimeMillis() % 1000);
+        generatedSubCategoryName = "Sub" + suffix;
+        categoriesPage.enterCategoryNameInAddForm(generatedSubCategoryName);
+    }
+
+    @And("the admin leaves the parent category empty")
+    public void the_admin_leaves_the_parent_category_empty() {
+        categoriesPage.leaveParentCategoryEmpty();
+    }
+
+    @And("the admin selects the created main category as parent")
+    public void the_admin_selects_the_created_main_category_as_parent() {
+        categoriesPage.selectParentCategoryByName(generatedMainCategoryName);
+    }
+
+    @Then("the category should be created successfully")
+    public void the_category_should_be_created_successfully() {
+        Assert.assertTrue(
+                "Category was NOT created successfully",
+                categoriesPage.isCategoryCreatedSuccessfully()
+        );
+    }
+
+    @Then("the sub-category should be created successfully")
+    public void the_sub_category_should_be_created_successfully() {
+        Assert.assertTrue(
+                "Sub-category was NOT created successfully",
+                categoriesPage.isCategoryCreatedSuccessfully()
+        );
+    }
+
+    @And("the new category should appear in the category list")
+    public void the_new_category_should_appear_in_the_category_list() {
+        Assert.assertTrue(
+                "Category '" + generatedCategoryName + "' was NOT found in the category list",
+                categoriesPage.isCategoryInList(generatedCategoryName)
+        );
+    }
+
+    @And("the main category should appear in the category list")
+    public void the_main_category_should_appear_in_the_category_list() {
+        Assert.assertTrue(
+                "Main Category '" + generatedMainCategoryName + "' was NOT found in the category list",
+                categoriesPage.isCategoryInList(generatedMainCategoryName)
+        );
+    }
+
+    @And("the sub-category should appear in the category list with correct parent")
+    public void the_sub_category_should_appear_in_the_category_list_with_correct_parent() {
+        Assert.assertTrue(
+                "Sub-Category '" + generatedSubCategoryName + "' was NOT found in the category list",
+                categoriesPage.isCategoryInList(generatedSubCategoryName)
+        );
+        Assert.assertTrue(
+                "Sub-Category '" + generatedSubCategoryName + "' does not have correct parent '" + generatedMainCategoryName + "'",
+                categoriesPage.isCategoryWithParent(generatedSubCategoryName, generatedMainCategoryName)
+        );
+    }
+
+    @When("the admin deletes the created category from UI")
+    public void the_admin_deletes_the_created_category_from_ui() {
+        categoriesPage.deleteCategoryByName(generatedCategoryName);
+    }
+
+    @When("the admin deletes the created sub-category from UI")
+    public void the_admin_deletes_the_created_sub_category_from_ui() {
+        categoriesPage.deleteCategoryByName(generatedSubCategoryName);
+    }
+
+    @When("the admin deletes the created main category from UI")
+    public void the_admin_deletes_the_created_main_category_from_ui() {
+        categoriesPage.deleteCategoryByName(generatedMainCategoryName);
+    }
+
+    @Then("the created category should be removed from the list")
+    public void the_created_category_should_be_removed_from_the_list() {
+        Assert.assertFalse(
+                "Category '" + generatedCategoryName + "' should NOT be in the list after deletion",
+                categoriesPage.isCategoryInList(generatedCategoryName)
+        );
+    }
+
+    @Then("the sub-category should be removed from the list")
+    public void the_sub_category_should_be_removed_from_the_list() {
+        Assert.assertFalse(
+                "Sub-Category '" + generatedSubCategoryName + "' should NOT be in the list after deletion",
+                categoriesPage.isCategoryInList(generatedSubCategoryName)
+        );
+    }
+
+    @Then("the main category should be removed from the list")
+    public void the_main_category_should_be_removed_from_the_list() {
+        Assert.assertFalse(
+                "Main Category '" + generatedMainCategoryName + "' should NOT be in the list after deletion",
+                categoriesPage.isCategoryInList(generatedMainCategoryName)
+        );
+    }
 }

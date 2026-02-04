@@ -45,22 +45,39 @@ Feature: Category Management - Admin
     When the admin clicks the Add Category button
     Then the Add Category page should be displayed
 
-#  Scenario: Add main category
-#    When the admin clicks the Add Category button
-#    And the admin enters a valid category name
-#    And the admin leaves the parent category empty
-#    And the admin clicks the Save button on category page
-#    Then the category should be created successfully
-#    And the new category should appear in the category list
-#
-#
-#  Scenario: Add sub-category
-#    When the admin clicks the Add Category button
-#    And the admin enters a valid category name
-#    And the admin selects a parent category
-#    And the admin clicks the Save button on category page
-#    Then the sub-category should be created successfully
-#    And the selected parent category should be displayed
+  Scenario: Add main category
+    And the admin is on the Categories page
+    When the admin clicks the Add Category button
+    And the admin enters a valid category name
+    And the admin leaves the parent category empty
+    And the admin clicks the Save button on category page
+    Then the category should be created successfully
+    And the new category should appear in the category list
+    When the admin deletes the created category from UI
+    Then the created category should be removed from the list
+
+
+  Scenario: Add sub-category
+    # First create a main category
+    And the admin is on the Categories page
+    When the admin clicks the Add Category button
+    And the admin enters a valid main category name
+    And the admin leaves the parent category empty
+    And the admin clicks the Save button on category page
+    Then the category should be created successfully
+    And the main category should appear in the category list
+    # Now create a sub-category under the main category
+    When the admin clicks the Add Category button
+    And the admin enters a valid sub-category name
+    And the admin selects the created main category as parent
+    And the admin clicks the Save button on category page
+    Then the sub-category should be created successfully
+    And the sub-category should appear in the category list with correct parent
+    # Cleanup - delete sub-category first, then main category
+    When the admin deletes the created sub-category from UI
+    Then the sub-category should be removed from the list
+    When the admin deletes the created main category from UI
+    Then the main category should be removed from the list
 
   Scenario: Category name required validation
     And the admin is on the Categories page

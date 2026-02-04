@@ -598,5 +598,142 @@ public class CategoriesPage {
                 && addBtnVisible;
     }
 
+    // ==================== Add Main Category Methods ====================
 
+    private final By addCategoryNameInput = By.id("name");
+    private final By parentCategorySelect = By.id("parentId");
+
+    /** Enter category name in Add Category form */
+    public void enterCategoryNameInAddForm(String categoryName) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(addCategoryNameInput));
+        input.clear();
+        input.sendKeys(categoryName);
+        System.out.println("Entered category name in Add form: " + categoryName);
+    }
+
+    /** Leave parent category empty (select "Main Category" option) */
+    public void leaveParentCategoryEmpty() {
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(parentCategorySelect));
+        Select select = new Select(dropdown);
+        select.selectByValue(""); // Select the "Main Category" option with empty value
+        System.out.println("Left parent category empty (Main Category selected)");
+    }
+
+    /** Check if category was created successfully by checking redirect */
+    public boolean isCategoryCreatedSuccessfully() {
+        try {
+            wait.until(ExpectedConditions.urlContains("/categories"));
+            String currentUrl = Driver.getDriver().getCurrentUrl();
+            return currentUrl.contains("/categories");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Check if a category name is present in the category list table */
+    public boolean isCategoryInList(String categoryName) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table tbody")));
+            List<WebElement> cells = Driver.getDriver().findElements(allNames);
+            for (WebElement cell : cells) {
+                if (cell.getText().trim().equalsIgnoreCase(categoryName)) {
+                    System.out.println("Category found in list: " + categoryName);
+                    return true;
+                }
+            }
+            System.out.println("Category NOT found in list: " + categoryName);
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /** Delete a category by name from the category list via UI */
+    public void deleteCategoryByName(String categoryName) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table tbody")));
+
+            // Find all rows in the table
+            List<WebElement> rows = Driver.getDriver().findElements(By.cssSelector("table.table tbody tr"));
+
+            for (WebElement row : rows) {
+                // Get the name cell (second column)
+                WebElement nameCell = row.findElement(By.cssSelector("td:nth-child(2)"));
+                String cellText = nameCell.getText().trim();
+
+                if (cellText.equalsIgnoreCase(categoryName)) {
+                    System.out.println("Found category to delete: " + categoryName);
+
+                    // Find and click the delete button in this row
+                    WebElement deleteBtn = row.findElement(By.cssSelector("form[action*='/delete'] button.btn-outline-danger"));
+                    deleteBtn.click();
+
+                    // Handle browser confirmation dialog
+                    try {
+                        wait.until(ExpectedConditions.alertIsPresent());
+                        Driver.getDriver().switchTo().alert().accept();
+                        System.out.println("Confirmed delete alert");
+                    } catch (Exception e) {
+                        // No alert present, continue
+                    }
+
+                    // Wait for page to reload
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table")));
+                    System.out.println("Category deleted successfully: " + categoryName);
+                    return;
+                }
+            }
+            System.out.println("Category not found for deletion: " + categoryName);
+        } catch (Exception e) {
+            System.out.println("Error deleting category: " + e.getMessage());
+        }
+    }
+
+    /** Select a parent category by name from the parent category dropdown */
+    public void selectParentCategoryByName(String parentCategoryName) {
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(parentCategorySelect));
+        Select select = new Select(dropdown);
+
+        // Get all options and find the one matching the category name
+        List<WebElement> options = select.getOptions();
+        for (WebElement option : options) {
+            if (option.getText().trim().equalsIgnoreCase(parentCategoryName)) {
+                select.selectByVisibleText(option.getText());
+                System.out.println("Selected parent category: " + parentCategoryName);
+                return;
+            }
+        }
+        System.out.println("Parent category not found in dropdown: " + parentCategoryName);
+    }
+
+    /** Check if a category has a specific parent in the category list table */
+    public boolean isCategoryWithParent(String categoryName, String expectedParentName) {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("table.table tbody")));
+
+            // Find all rows in the table
+            List<WebElement> rows = Driver.getDriver().findElements(By.cssSelector("table.table tbody tr"));
+
+            for (WebElement row : rows) {
+                // Get the name cell (second column)
+                WebElement nameCell = row.findElement(By.cssSelector("td:nth-child(2)"));
+                String cellName = nameCell.getText().trim();
+
+                if (cellName.equalsIgnoreCase(categoryName)) {
+                    // Get the parent cell (third column)
+                    WebElement parentCell = row.findElement(By.cssSelector("td:nth-child(3)"));
+                    String parentName = parentCell.getText().trim();
+
+                    boolean matches = parentName.equalsIgnoreCase(expectedParentName);
+                    System.out.println("Category '" + categoryName + "' has parent '" + parentName + "' (expected: '" + expectedParentName + "'): " + matches);
+                    return matches;
+                }
+            }
+            System.out.println("Category not found: " + categoryName);
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error checking category parent: " + e.getMessage());
+            return false;
+        }
+    }
 }
