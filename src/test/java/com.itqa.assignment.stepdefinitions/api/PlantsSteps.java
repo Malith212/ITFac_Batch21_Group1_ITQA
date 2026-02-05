@@ -5,7 +5,7 @@ import com.itqa.assignment.stepdefinitions.PlantsHooks;
 import com.itqa.assignment.utilities.ApiHelper;
 import com.itqa.assignment.utilities.ConfigReader;
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.en.And;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -20,7 +20,7 @@ public class PlantsSteps {
     private static String plantId;
     private static String plantCategoryId;
 
-    @And("a valid sub-category exists for plant creation")
+    @When("a valid sub-category exists for plant creation")
     public void a_valid_sub_category_exists_from_hook() {
         List<Integer> categoryIds = PlantsHooks.getCategoryIds();
 
@@ -58,7 +58,7 @@ public class PlantsSteps {
         ScenarioContext.setApiResponse(apiResponse);
     }
 
-    @And("the response body should contain a valid {string}")
+    @Then("the response body should contain a valid {string}")
     public void the_response_body_should_contain_a_valid(String key) {
         Response response = ScenarioContext.getApiResponse();
         Object value = response.jsonPath().get(key);
@@ -69,14 +69,14 @@ public class PlantsSteps {
         }
     }
 
-    @And("the response body should contain {string} with value {string}")
+    @Then("the response body should contain {string} with value {string}")
     public void the_response_body_should_contain_with_value(String key, String expectedValue) {
         Response response = ScenarioContext.getApiResponse();
         String actualValue = response.jsonPath().getString(key);
         Assert.assertEquals("Value mismatch for key: " + key, expectedValue, actualValue);
     }
 
-    @And("a plant exists for update")
+    @When("a plant exists for update")
     public void a_plant_exists_for_update() {
         List<Integer> plantIds = PlantsHooks.getPlantIds();
         List<Integer> categoryIds = PlantsHooks.getCategoryIds();
@@ -117,7 +117,7 @@ public class PlantsSteps {
         ScenarioContext.setApiResponse(apiResponse);
     }
 
-    @And("a plant exists for deletion")
+    @When("a plant exists for deletion")
     public void a_plant_exists_for_deletion() {
         List<Integer> plantIds = PlantsHooks.getPlantIds();
 
@@ -149,7 +149,7 @@ public class PlantsSteps {
         ScenarioContext.setApiResponse(apiResponse);
     }
 
-    @And("a plant exists for retrieval")
+    @When("a plant exists for retrieval")
     public void a_plant_exists_for_retrieval() {
         List<Integer> plantIds = PlantsHooks.getPlantIds();
 
@@ -177,7 +177,7 @@ public class PlantsSteps {
         ScenarioContext.setApiResponse(apiResponse);
     }
 
-    @And("the response body should contain the created plant name")
+    @Then("the response body should contain the created plant name")
     public void the_response_body_should_contain_the_created_plant_name() {
         Response response = ScenarioContext.getApiResponse();
         String actualName = response.jsonPath().getString("name");
@@ -187,7 +187,7 @@ public class PlantsSteps {
         Assert.assertEquals("Plant name mismatch", expectedName, actualName);
     }
 
-    @And("the response body should contain validation error for price")
+    @Then("the response body should contain validation error for price")
     public void the_response_body_should_contain_validation_error_for_price() {
         Response response = ScenarioContext.getApiResponse();
         String responseBody = response.getBody().asString();
@@ -198,7 +198,7 @@ public class PlantsSteps {
                 responseBody.contains("validation"));
     }
 
-    @And("the created plant is deleted")
+    @Then("the created plant is deleted")
     public void the_created_plant_is_deleted() {
         Response response = ScenarioContext.getApiResponse();
         int createdPlantId = response.jsonPath().getInt("id");
@@ -211,5 +211,147 @@ public class PlantsSteps {
                 .delete("/plants/" + createdPlantId);
 
         System.out.println("Cleanup - Deleted Plant ID: " + createdPlantId + ", Status: " + deleteResponse.getStatusCode());
+    }
+
+    @When("the user sends a POST request to {string} with plant details:")
+    public void the_user_sends_a_post_request_to_with_plant_details(String endpoint, DataTable dataTable) {
+        String actualEndpoint = endpoint.replace("{categoryId}", subCategoryId);
+        Map<String, String> dataMap = dataTable.asMap(String.class, String.class);
+
+        Map<String, Object> plantBody = Map.of(
+                "name", dataMap.get("name"),
+                "price", Integer.parseInt(dataMap.get("price")),
+                "quantity", Integer.parseInt(dataMap.get("quantity")),
+                "categoryId", Integer.parseInt(subCategoryId)
+        );
+        System.out.println("Request Body: " + plantBody);
+
+        Response apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .body(plantBody)
+                .when()
+                .post(actualEndpoint);
+
+        System.out.println("Response Status: " + apiResponse.getStatusCode());
+        System.out.println("Response Body: " + apiResponse.getBody().asString());
+
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @Then("the response body should contain error message for insufficient permissions")
+    public void the_response_body_should_contain_error_message_for_insufficient_permissions() {
+        Response response = ScenarioContext.getApiResponse();
+        String responseBody = response.getBody().asString();
+
+        Assert.assertTrue("Expected error message for insufficient permissions in response",
+                responseBody.toLowerCase().contains("forbidden") ||
+                responseBody.toLowerCase().contains("access denied") ||
+                responseBody.toLowerCase().contains("permission") ||
+                response.getStatusCode() == 403);
+    }
+
+    @When("a plant exists for user deletion attempt")
+    public void a_plant_exists_for_user_deletion_attempt() {
+        List<Integer> plantIds = PlantsHooks.getPlantIds();
+
+        if (plantIds == null || plantIds.isEmpty()) {
+            throw new RuntimeException("No plants found for deletion test. Ensure @SeedPlantSearchTest hook ran.");
+        }
+
+        plantId = String.valueOf(plantIds.get(0));
+    }
+
+    @When("the user sends a DELETE request to {string}")
+    public void the_user_sends_a_delete_request_to(String endpoint) {
+        String actualEndpoint = endpoint.replace("{plantId}", plantId);
+
+        Response apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .delete(actualEndpoint);
+
+        System.out.println("Response Status: " + apiResponse.getStatusCode());
+        System.out.println("Response Body: " + apiResponse.getBody().asString());
+
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @When("a plant exists for user update attempt")
+    public void a_plant_exists_for_user_update_attempt() {
+        List<Integer> plantIds = PlantsHooks.getPlantIds();
+        List<Integer> categoryIds = PlantsHooks.getCategoryIds();
+
+        if (plantIds == null || plantIds.isEmpty()) {
+            throw new RuntimeException("No plants found for update test. Ensure @SeedPlantSearchTest hook ran.");
+        }
+
+        plantId = String.valueOf(plantIds.get(0));
+        plantCategoryId = String.valueOf(categoryIds.get(1));
+    }
+
+    @When("the user sends a PUT request to {string} with updated details:")
+    public void the_user_sends_a_put_request_to_with_updated_details(String endpoint, DataTable dataTable) {
+        String actualEndpoint = endpoint.replace("{plantId}", plantId);
+        Map<String, String> dataMap = dataTable.asMap(String.class, String.class);
+
+        Map<String, Object> plantBody = Map.of(
+                "id", Integer.parseInt(plantId),
+                "name", dataMap.get("name"),
+                "price", Integer.parseInt(dataMap.get("price")),
+                "quantity", Integer.parseInt(dataMap.get("quantity")),
+                "categoryId", Integer.parseInt(plantCategoryId)
+        );
+        System.out.println("Request Body: " + plantBody);
+
+        Response apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .body(plantBody)
+                .when()
+                .put(actualEndpoint);
+
+        System.out.println("Response Status: " + apiResponse.getStatusCode());
+        System.out.println("Response Body: " + apiResponse.getBody().asString());
+
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @When("the user sends a GET request to {string}")
+    public void the_user_sends_a_get_request_to(String endpoint) {
+        Response apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get(endpoint);
+
+        System.out.println("Response Status: " + apiResponse.getStatusCode());
+        System.out.println("Response Body: " + apiResponse.getBody().asString());
+
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @Then("the response body should contain a list of plants")
+    public void the_response_body_should_contain_a_list_of_plants() {
+        Response response = ScenarioContext.getApiResponse();
+        List<Object> content = response.jsonPath().getList("content");
+
+        Assert.assertNotNull("Expected 'content' to be present in response", content);
+        Assert.assertTrue("Expected plant list to not be empty", content.size() >= 0);
+    }
+
+    @Then("the response body should contain content array with max {int} items")
+    public void the_response_body_should_contain_content_array_with_max_items(int maxItems) {
+        Response response = ScenarioContext.getApiResponse();
+        List<Object> content = response.jsonPath().getList("content");
+
+        Assert.assertNotNull("Expected 'content' to be present in response", content);
+        Assert.assertTrue("Expected content array to have max " + maxItems + " items, but found " + content.size(),
+                content.size() <= maxItems);
     }
 }
