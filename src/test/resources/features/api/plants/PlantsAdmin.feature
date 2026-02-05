@@ -52,3 +52,52 @@ Feature: Plants API Validation (Admin)
     Then the response status code should be 400
     And the response body should contain validation error for price
 
+  @SeedDashboardTests
+  Scenario: TC_PLT_ADM_13 - Verify duplicate plant names in the same category are not allowed
+    Given admin auth token is set
+    And valid sub-category id exists
+    And a plant named "LowFern" exists in that sub-category
+    When the admin sends a POST request to "/plants/category/{categoryId}" with plant details:
+     | name     | LowFern     |
+     | price    | 100         |
+     | quantity | 10          |
+    Then the response status code should be 400
+    And the response should contain an error message "Plant 'LowFern' already exists in this category"
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_ADM_14 - Verify validation fails if name, character length less than specified minLength 3
+    Given admin auth token is set
+    And valid sub-category id exists
+    When the admin sends a POST request to "/plants/category/{categoryId}" with plant details:
+     | name     | AB          |
+     | price    | 100         |
+     | quantity | 10          |
+    Then the response status code should be 400
+    And the response body should contain validation error for name length
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_ADM_15 - Verify 404 response when attempting to update a non-existent plant ID
+    Given admin auth token is set
+    When the admin sends a PUT request to "/plants/9999" with updated details:
+      | name     | NonExistentPlant |
+      | price    | 100              |
+      | quantity | 10               |
+    Then the response status code should be 404
+    And the response should contain an error message "Plant not found"
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_ADM_16 - Verify validation fails when a Admin user deletes a plant that does not exist
+    Given admin auth token is set
+    When the admin sends a DELETE request to "/plants/9999"
+    Then the response status code should be 404
+    And the response should contain an error message "Plant not found"
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_ADM_17 - Verify validation fails when an Amin user creates a plant with a non-existent Category ID
+    Given admin auth token is set
+    When the admin sends a POST request to "/plants/category/9999" with plant details:
+      | name     | InvalidCategoryPlant |
+      | price    | 100                  |
+      | quantity | 10                   |
+    Then the response status code should be 404
+    And the response should contain an error message "Category not found"
