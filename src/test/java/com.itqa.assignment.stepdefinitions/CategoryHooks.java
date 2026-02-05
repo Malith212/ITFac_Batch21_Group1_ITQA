@@ -121,4 +121,8 @@ public class CategoryHooks {
     public static String getSortTestParentCategoryName() {
         return sortTestParentCategoryName;
     }
+
+    public static List<Integer> getCategorySearchTestCategoryIds() {
+        return categorySearchTestCategoryIds;
+    }
 }
