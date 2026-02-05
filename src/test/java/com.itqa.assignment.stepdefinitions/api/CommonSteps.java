@@ -33,4 +33,10 @@ public class CommonSteps {
         int actualValue = ScenarioContext.getApiResponse().jsonPath().getInt(key);
         Assert.assertEquals("Value mismatch for key: " + key, expectedValue, actualValue);
     }
+
+    @Then("the response should contain an error message {string}")
+    public void the_response_should_contain_an_error_message(String expectedMessage) {
+        String actualMessage = ScenarioContext.getApiResponse().jsonPath().getString("message");
+        Assert.assertEquals("Error message mismatch! Expected: [" + expectedMessage + "] but was: [" + actualMessage + "]", expectedMessage, actualMessage);
+    }
 }
