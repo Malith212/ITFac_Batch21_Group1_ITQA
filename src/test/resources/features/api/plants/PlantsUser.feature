@@ -1,4 +1,4 @@
-@api @user @mvp
+@api @user
 Feature: Plants API Validation (User)
 
   @SeedPlantSearchTest
@@ -44,4 +44,28 @@ Feature: Plants API Validation (User)
     When the user sends a GET request to "/plants/paged?page=0&size=5"
     Then the response status code should be 200
     And the response body should contain content array with max 5 items
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_USR_11 - Verify 404 response when requesting a non-existent plant ID
+    Given user auth token is set
+    When the user sends a GET request to retrieve plant with id 9999 from "/plants/9999"
+    Then the response status code should be 404
+    And the response should contain an error message "Plant not found: 9999"
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_USR_12 - Verify User can retrieve all plants associated with a specific sub-category
+    Given user auth token is set
+    And valid sub-category id exists
+    When the user sends a GET request to retrieve plants by sub-category id from "/plants/category/{subCategoryId}"
+    Then the response status code should be 200
+    And the response should contain a list of plants associated with the provided sub-category id
+
+  @SeedDashboardTests
+  Scenario: TC_PLT_USR_13 - Verify User can get plants using plant name
+    Given user auth token is set
+    And valid plant name exists
+    When the user sends a GET request to retrieve plants by name from "/plants/paged?page=0&size=5&name={plantName}"
+    Then the response status code should be 200
+    And the response should contain a list with 1 plant object with name "LowFern"
+
 

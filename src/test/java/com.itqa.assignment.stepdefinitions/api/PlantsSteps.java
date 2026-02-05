@@ -1,10 +1,12 @@
 package com.itqa.assignment.stepdefinitions.api;
 
 import com.itqa.assignment.context.ScenarioContext;
+import com.itqa.assignment.stepdefinitions.DashboardHooks;
 import com.itqa.assignment.stepdefinitions.PlantsHooks;
 import com.itqa.assignment.utilities.ApiHelper;
 import com.itqa.assignment.utilities.ConfigReader;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -19,6 +21,32 @@ public class PlantsSteps {
     private static String subCategoryId;
     private static String plantId;
     private static String plantCategoryId;
+    private static String plantName;
+
+    Response response;
+
+    @Given("valid sub-category id exists")
+    public void valid_sub_category_id_exists() {
+        List<Integer> categoryIds = DashboardHooks.getCategoryIds();
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            throw new RuntimeException("No category found. Ensure @SeedDashboardTest hook ran.");
+        }
+        subCategoryId = String.valueOf(categoryIds.get(1));
+    }
+
+    @Given("valid plant name exists")
+    public void valid_plant_name_exists() {
+        List<String> plantNames = DashboardHooks.getCreatedPlantNames();
+        if (plantNames == null || plantNames.isEmpty()) {
+            throw new RuntimeException("No plant name found. Ensure @SeedDashboardTest hook ran.");
+        }
+        plantName = plantNames.getFirst();
+    }
+
+    @Given("a plant named {string} exists in that sub-category")
+    public void a_plant_named_exists_in_that_sub_category(String name) {
+        plantName = name;
+    }
 
     @When("a valid sub-category exists for plant creation")
     public void a_valid_sub_category_exists_from_hook() {
@@ -55,6 +83,41 @@ public class PlantsSteps {
         System.out.println("Response Status: " + apiResponse.getStatusCode());
         System.out.println("Response Body: " + apiResponse.getBody().asString());
 
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @When("the user sends a GET request to retrieve plant with id 9999 from {string}")
+    public void the_user_sends_a_get_request_to_retrieve_plant_with_id_9999_from(String endpoint) {
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get(endpoint);
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @When("the user sends a GET request to retrieve plants by sub-category id from {string}")
+    public void the_user_sends_a_get_request_to_retrieve_plants_by_sub_category_id_from(String endpoint) {
+        String actualEndpoint = endpoint.replace("{subCategoryId}", subCategoryId);
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get(actualEndpoint);
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @When("the user sends a GET request to retrieve plants by name from {string}")
+    public void the_user_sends_a_get_request_to_retrieve_plants_by_name_from(String endpoint) {
+        String actualEndpoint = endpoint.replace("{plantName}", plantName);
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get(actualEndpoint);
         ScenarioContext.setApiResponse(apiResponse);
     }
 
@@ -196,6 +259,17 @@ public class PlantsSteps {
                 responseBody.toLowerCase().contains("price") ||
                 responseBody.contains("must be greater than") ||
                 responseBody.contains("validation"));
+    }
+
+    @Then("the response body should contain validation error for name length")
+    public void the_response_body_should_contain_validation_error_for_name_length() {
+        Response response = ScenarioContext.getApiResponse();
+        String nameError = response.getBody().asString();
+
+        Assert.assertNotNull("Expected 'details.name' to be present in response", nameError);
+        Assert.assertTrue("Expected validation error for name length in response",
+                nameError.toLowerCase().contains("validation failed") &&
+                (nameError.contains("must be between")));
     }
 
     @Then("the created plant is deleted")
@@ -353,5 +427,23 @@ public class PlantsSteps {
         Assert.assertNotNull("Expected 'content' to be present in response", content);
         Assert.assertTrue("Expected content array to have max " + maxItems + " items, but found " + content.size(),
                 content.size() <= maxItems);
+    }
+
+    @Then("the response should contain a list of plants associated with the provided sub-category id")
+    public void the_response_should_contain_a_list_of_plants_associated_with_the_provided_sub_category_id() {
+        List<Map<String, Object>> plants = ScenarioContext.getApiResponse().jsonPath().getList("");
+        for (Map<String, Object> plant : plants) {
+            Map<String, Object> category = (Map<String, Object>) plant.get("category");
+            String actualCategoryId = category.get("id").toString();
+            Assert.assertEquals("Expected category name: " + subCategoryId + ", but got: " + actualCategoryId, subCategoryId, actualCategoryId);
+        }
+    }
+
+    @Then("the response should contain a list with {int} plant object with name {string}")
+    public void the_response_should_contain_a_list_with_1_plant_object_with_name(int count, String plantName) {
+        List<Map<String, Object>> plants = ScenarioContext.getApiResponse().jsonPath().getList("content");
+        Assert.assertEquals("Expected exactly " + count + " plant in the response", count, plants.size());
+        String actualPlantName = plants.getFirst().get("name").toString();
+        Assert.assertEquals("Expected plant name: " + plantName + ", but got: " + actualPlantName, plantName, actualPlantName);
     }
 }
