@@ -16,15 +16,13 @@ public class ApiCleanupUtil {
         Response listRes = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + getJwtToken(ApiHelper.UserRole.ADMIN))
-                .get("/categories?page=0&size=2000&sort=id,desc");
+                .get("/categories/page?page=0&size=100&sortField=id&sortDir=asc");
 
         // 3. Filter and Delete
         List<Map<String, Object>> categories = listRes.jsonPath().getList("content");
 
         if (categories != null) {
-            categories.stream()
-                    .filter(c -> c.get("name") != null && c.get("name").toString().startsWith(PREFIX))
-                    .forEach(this::deleteCategory);
+            categories.forEach(this::deleteCategory);
         }
     }
 
@@ -41,15 +39,13 @@ public class ApiCleanupUtil {
         Response listRes = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + getJwtToken(ApiHelper.UserRole.ADMIN))
-                .get("/plants?page=0&size=2000");
+                .get("plants/paged?page=0&size=1000&sort=desc");
 
         // 3. Filter and Delete
         List<Map<String, Object>> plants = listRes.jsonPath().getList("content");
 
         if (plants != null) {
-            plants.stream()
-                    .filter(p -> p.get("name") != null && p.get("name").toString().startsWith(PREFIX))
-                    .forEach(this::deletePlant);
+            plants.forEach(this::deletePlant);
         }
     }
 
@@ -66,15 +62,13 @@ public class ApiCleanupUtil {
         Response listRes = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + getJwtToken(ApiHelper.UserRole.ADMIN))
-                .get("/sales?page=0&size=2000");
+                .get("sales/page?page=0&size=2000&sort=desc");
 
         // 3. Filter and Delete
         List<Map<String, Object>> sales = listRes.jsonPath().getList("content");
 
         if (sales != null) {
-            sales.stream()
-                    .filter(s -> s.get("name") != null && s.get("name").toString().startsWith(PREFIX))
-                    .forEach(this::deleteSales);
+            sales.forEach(this::deleteSales);
         }
     }
 

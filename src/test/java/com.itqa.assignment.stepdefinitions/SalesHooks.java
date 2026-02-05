@@ -59,6 +59,28 @@ public class SalesHooks {
         plantIds.add(Integer.parseInt(id2));
     }
 
+    @Before(value = "@SeedSalesAdminTests", order = 3)
+    public void seedSalesForAdminTests() {
+        // Plant 1 stock = 15
+        for (int i = 0; i < 10; i++) {
+            Map<String, Object> sale = Map.of("quantity", 1);
+            String saleId = ApiHelper.postWithParams(
+                    "/sales/plant/" + plantIds.getFirst(),
+                    sale
+            );
+            saleIds.add(Integer.parseInt(saleId));
+        }
+        // Plant 2 stock = 10
+        for (int i = 0; i < 7; i++) {
+            Map<String, Object> sale = Map.of("quantity", 1);
+            String saleId = ApiHelper.postWithParams(
+                    "/sales/plant/" + plantIds.get(1),
+                    sale
+            );
+            saleIds.add(Integer.parseInt(saleId));
+        }
+    }
+
     @After(value = "@SeedSalesAdminTests", order = 2)
     public void cleanup() {
         DatabaseUtil.executeUpdate("delete from inventory");
