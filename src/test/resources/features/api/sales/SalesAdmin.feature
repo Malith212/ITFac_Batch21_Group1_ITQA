@@ -1,4 +1,4 @@
-@api @admin @Maliha
+@api @admin
 Feature: Sales API Validation for authenticated Admin
 
   @SeedSalesAdminTests  @CleanUpSales
@@ -20,7 +20,7 @@ Feature: Sales API Validation for authenticated Admin
   Scenario: TC_SLS_ADM_08 - Verify admin can get paginated sales records sorted by plant name
     Given admin auth token is set
     And sales records exist in the database
-    When the admin sends a GET request to "/sales/page?page=0&size=3&sort=plantName"
+    When the admin send GET request to "/sales/page?page=0&size=3&sort=plantName"
     Then the response status code should be 200
     And the response contains a content array with max 3 items sorted by Plant Name
 
@@ -38,5 +38,5 @@ Feature: Sales API Validation for authenticated Admin
     And a non-existent plantId is provided
     When the admin sends a POST request to create sale with invalid plantId at "/sales/plant"
     Then the response status code should be 404
-    And the response contains error message "Plant not found"
+    And the response should contain an error message "Plant not found"
 

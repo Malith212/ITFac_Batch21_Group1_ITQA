@@ -134,8 +134,8 @@ public class SalesSteps {
         }
     }
 
-    @When("the admin sends a GET request to {string}")
-    public void the_admin_sends_a_get_request_to(String endpoint) {
+    @When("the admin send GET request to {string}")
+    public void the_admin_send_get_request_to(String endpoint) {
         var apiResponse = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.ADMIN))
@@ -231,12 +231,148 @@ public class SalesSteps {
         ScenarioContext.setApiResponse(apiResponse);
     }
 
-    @Then("the response contains error message {string}")
-    public void the_response_contains_error_message(String expectedMessage) {
-        var response = ScenarioContext.getApiResponse();
-        String errorMessage = response.getBody().asString();
+    // ========== USER SALES TESTS ==========
 
-        Assert.assertTrue("Expected error message not found in response",
-                errorMessage.contains(expectedMessage));
+    // TC_SLS_USR_06 - User Get all Sales
+    @Given("sales records exist in the database for user tests")
+    public void sales_records_exist_in_the_database_for_user_tests() {
+        // Verify that sales records exist by fetching them
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get("sales/page?page=0&size=2000&sort=desc");
+
+        List<Map<String, Object>> content = apiResponse.jsonPath().getList("content");
+        Assert.assertNotNull("Sales records should exist in database", content);
+        Assert.assertFalse("Sales records should not be empty", content.isEmpty());
+    }
+
+    @When("the user send GET request to {string}")
+    public void the_user_send_get_request_to(String endpoint) {
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get(endpoint);
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @Then("the response contains a sales record array")
+    public void the_response_contains_a_sales_record_array() {
+        var response = ScenarioContext.getApiResponse();
+        List<Map<String, Object>> sales = response.jsonPath().getList("");
+        Assert.assertNotNull("Sales record array is null", sales);
+        Assert.assertFalse("Sales record array is empty", sales.isEmpty());
+    }
+
+    // TC_SLS_USR_07 - User Get all sales with sorting by Quantity
+    @Then("the response contains a content array with max {int} items sorted by Quantity")
+    public void the_response_contains_a_content_array_with_max_items_sorted_by_quantity(int maxSize) {
+        var response = ScenarioContext.getApiResponse();
+        List<Map<String, Object>> content = response.jsonPath().getList("content");
+
+        Assert.assertNotNull("Content array is null", content);
+        Assert.assertTrue("Content array exceeds max size", content.size() <= maxSize);
+
+        // Verify sorting by quantity
+        if (content.size() > 1) {
+            for (int i = 0; i < content.size() - 1; i++) {
+                Number qty1 = (Number) content.get(i).get("quantity");
+                Number qty2 = (Number) content.get(i + 1).get("quantity");
+
+                Assert.assertTrue("Quantities are not sorted correctly",
+                        qty1.intValue() <= qty2.intValue());
+            }
+        }
+    }
+
+    // TC_SLS_USR_08 - User Get all sales with sorting by Total Price
+    @Then("the response contains a content array with max {int} items sorted by Total Price")
+    public void the_response_contains_a_content_array_with_max_items_sorted_by_total_price(int maxSize) {
+        var response = ScenarioContext.getApiResponse();
+        List<Map<String, Object>> content = response.jsonPath().getList("content");
+
+        Assert.assertNotNull("Content array is null", content);
+        Assert.assertTrue("Content array exceeds max size", content.size() <= maxSize);
+
+        // Verify sorting by total price
+        if (content.size() > 1) {
+            for (int i = 0; i < content.size() - 1; i++) {
+                Number price1 = (Number) content.get(i).get("totalPrice");
+                Number price2 = (Number) content.get(i + 1).get("totalPrice");
+
+                Assert.assertTrue("Total prices are not sorted correctly",
+                        price1.doubleValue() <= price2.doubleValue());
+            }
+        }
+    }
+
+    // TC_SLS_USR_09 - User cannot create a plant sale
+    @Given("valid plantId and quantity are provided for user")
+    public void valid_plant_id_and_quantity_are_provided_for_user() {
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get("/plants");
+
+        List<Map<String, Object>> plants = apiResponse.jsonPath().getList("");
+        if (plants != null && !plants.isEmpty()) {
+            Map<String, Object> firstPlant = plants.getFirst();
+            Number idNum = (Number) firstPlant.get("id");
+            Number qtyNum = (Number) firstPlant.get("quantity");
+            this.plantId = idNum != null ? idNum.intValue() : 0;
+            int availableQuantity = qtyNum != null ? qtyNum.intValue() : 0;
+            this.quantity = Math.min(1, availableQuantity);
+        }
+    }
+
+    @When("the user sends a POST request to create a new plant sale at {string}")
+    public void the_user_sends_a_post_request_to_create_a_new_plant_sale_at(String endpoint) {
+        String fullEndpoint = endpoint + "/" + this.plantId + "?quantity=" + this.quantity;
+
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .post(fullEndpoint);
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    // TC_SLS_USR_10 - User cannot delete a sale record
+    @Given("a valid sale record exists in the database for user tests")
+    public void a_valid_sale_record_exists_in_the_database_for_user_tests() {
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .get("sales/page?page=0&size=2000&sort=desc");
+
+        List<Map<String, Object>> sales = apiResponse.jsonPath().getList("content");
+        if (sales != null && !sales.isEmpty()) {
+            Map<String, Object> firstSale = sales.getFirst();
+            Number idNum = (Number) firstSale.get("id");
+            this.saleId = idNum != null ? idNum.intValue() : 0;
+        }
+        Assert.assertTrue("No valid sale record found for deletion", this.saleId > 0);
+    }
+
+    @When("the user sends a DELETE request to {string} with valid sale ID")
+    public void the_user_sends_a_delete_request_to_with_valid_sale_id(String endpoint) {
+        String fullEndpoint = endpoint.replace("{id}", String.valueOf(this.saleId));
+
+        var apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.USER))
+                .contentType("application/json")
+                .when()
+                .delete(fullEndpoint);
+        ScenarioContext.setApiResponse(apiResponse);
     }
 }
