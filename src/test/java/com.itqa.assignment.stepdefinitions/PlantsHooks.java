@@ -302,4 +302,13 @@ public class PlantsHooks {
     public static String getCategoryDropdownSubCatName() {
         return categoryDropdownSubCatName;
     }
+
+    // Getter methods for plant IDs and category IDs (for API tests)
+    public static List<Integer> getPlantIds() {
+        return plantIds;
+    }
+
+    public static List<Integer> getCategoryIds() {
+        return categoryIds;
+    }
 }
