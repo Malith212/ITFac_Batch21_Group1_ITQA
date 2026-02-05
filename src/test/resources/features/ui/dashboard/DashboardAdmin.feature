@@ -16,7 +16,7 @@ Feature: Dashboard Functionality
       | Sales      | Sales      |
       | Plants     | Plants     |
 
-    Scenario: TC_DSH_ADM_03 - Verify the "Manage Categories" button redirects to the Category page
-      Given the admin is on the "Dashboard" page
-      When the admin clicks on the "Manage Categories" button in the Dashboard page
-      Then the URL should contain "/categories"
+  Scenario: TC_DSH_ADM_03 - Verify the "Manage Categories" button redirects to the Category page
+    Given the admin is on the "Dashboard" page
+    When the admin clicks on the "Manage Categories" button in the Dashboard page
+    Then the URL should contain "/categories"

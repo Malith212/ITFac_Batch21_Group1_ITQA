@@ -16,7 +16,7 @@ public class ApiCleanupUtil {
         Response listRes = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + getJwtToken(ApiHelper.UserRole.ADMIN))
-                .get("/categories/page?page=0&size=100&sortField=id&sortDir=asc");
+                .get("/categories/page?page=0&size=2000&sort=id,desc");
 
         // 3. Filter and Delete
         List<Map<String, Object>> categories = listRes.jsonPath().getList("content");
@@ -39,7 +39,7 @@ public class ApiCleanupUtil {
         Response listRes = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + getJwtToken(ApiHelper.UserRole.ADMIN))
-                .get("plants/paged?page=0&size=1000&sort=desc");
+                .get("/plants/paged?page=0&size=2000");
 
         // 3. Filter and Delete
         List<Map<String, Object>> plants = listRes.jsonPath().getList("content");
@@ -62,7 +62,7 @@ public class ApiCleanupUtil {
         Response listRes = RestAssured.given()
                 .baseUri(ConfigReader.getProperty("api.base.uri"))
                 .header("Authorization", "Bearer " + getJwtToken(ApiHelper.UserRole.ADMIN))
-                .get("sales/page?page=0&size=2000&sort=desc");
+                .get("/sales/page?page=0&size=2000");
 
         // 3. Filter and Delete
         List<Map<String, Object>> sales = listRes.jsonPath().getList("content");
