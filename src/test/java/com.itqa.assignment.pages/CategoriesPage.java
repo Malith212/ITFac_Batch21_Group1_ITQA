@@ -301,10 +301,9 @@ public class CategoriesPage {
         searchButton.click();
         System.out.println("Search button clicked");
 
-        // Wait until the table is updated with results
-        // Replace the fixed 10s sleep with a wait for the first row of results to be visible
-        By firstRowResult = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]"); // first row of table
-        wait.until(ExpectedConditions.visibilityOfElementLocated(firstRowResult));
+        // Wait for the table body to be present (handles empty results for invalid searches)
+        By tableBody = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody");
+        wait.until(ExpectedConditions.presenceOfElementLocated(tableBody));
         System.out.println("Search results loaded");
     }
 

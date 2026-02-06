@@ -37,3 +37,41 @@ Feature: Category API Validation (Admin)
     When the admin sends a GET request to get paginated categories from "/categories/page?page=0&size=10&sortField=id&sortDir=desc"
     Then the response status code should be 200
     And the response should contain a paginated and sorted category list
+
+#    PRAMESH
+  @CleanUpCategory
+  Scenario: TC_CAT_ADM_16 - Admin cannot create category with duplicate name
+    Given admin auth token is set
+    And a category already exists with name "Indoor"
+    When admin sends POST request to "/categories" with category name "Indoor"
+    Then the response status code should be 400
+    And the response should contain an error message "Main category 'Indoor' already exists"
+
+  @CleanUpCategory
+  Scenario: TC_CAT_ADM_17 - Admin cannot create category with name less than minimum length
+    Given admin auth token is set
+    When admin sends POST request to "/categories" with category name "Ab"
+    Then the response status code should be 400
+    And the response should contain a validation error for "name" with message "Category name must be between 3 and 10 characters"
+
+  @CleanUpCategory
+  Scenario: TC_CAT_ADM_18 - Admin cannot create category with name greater than maximum length
+    Given admin auth token is set
+    When admin sends POST request to "/categories" with category name "VeryLongCategoryName"
+    Then the response status code should be 400
+    And the response should contain a validation error for "name" with message "Category name must be between 3 and 10 characters"
+
+  @CleanUpCategory
+  Scenario: TC_CAT_ADM_19 - Admin cannot create category with invalid parent ID
+    Given admin auth token is set
+    When admin sends POST request to "/categories" with category name "InvalidSub" and invalid parent id 999999
+    Then the response status code should be 400
+
+  @SeedCategorySearchTest @CleanUpCategory
+  Scenario: TC_CAT_ADM_20 - Admin cannot update category with empty name
+    Given admin auth token is set
+    And a valid category ID exists
+    When the admin sends a PUT request to "/categories/{categoryId}" with category details:
+      | name |  |
+    Then the response status code should be 400
+    And the response should contain a validation error for "name" with message "Category name must be between 3 and 10 characters"
