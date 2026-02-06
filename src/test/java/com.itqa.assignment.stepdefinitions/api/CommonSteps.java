@@ -39,4 +39,24 @@ public class CommonSteps {
         String actualMessage = ScenarioContext.getApiResponse().jsonPath().getString("message");
         Assert.assertEquals("Error message mismatch! Expected: [" + expectedMessage + "] but was: [" + actualMessage + "]", expectedMessage, actualMessage);
     }
+
+//PRAMESH
+
+    @Then("the response should contain a validation error for {string} with message {string}")
+    public void the_response_should_contain_validation_error_for_field(
+            String field,
+            String expectedMessage
+    ) {
+        String actualMessage = ScenarioContext
+                .getApiResponse()
+                .jsonPath()
+                .getString("details." + field);
+
+        Assert.assertEquals(
+                "Validation message mismatch for field: " + field,
+                expectedMessage,
+                actualMessage
+        );
+    }
+
 }
