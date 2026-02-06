@@ -1,5 +1,5 @@
 @ui
-Feature: Sales User Functionality
+Feature: Sales Management User Functionality
 
   Background:
     Given the user is logged into the system

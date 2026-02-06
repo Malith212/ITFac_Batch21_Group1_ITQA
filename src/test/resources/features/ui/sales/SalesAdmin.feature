@@ -1,5 +1,5 @@
 @ui
-Feature: Sales Management Functionality
+Feature: Sales Management Admin Functionality
 
   Background:
     Given the admin is logged into the system

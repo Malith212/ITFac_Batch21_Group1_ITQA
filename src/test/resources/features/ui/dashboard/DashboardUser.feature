@@ -1,5 +1,5 @@
 @ui
-Feature: Dashboard Functionality
+Feature: Dashboard Management User Functionality
 
   Background:
     Given the user is logged into the system

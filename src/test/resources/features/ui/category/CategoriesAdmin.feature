@@ -1,5 +1,5 @@
 @ui
-Feature: Category Management - Admin
+Feature: Category Management Admin Functionality
 
   Background:
     Given the admin is logged into the system
@@ -40,8 +40,6 @@ Feature: Category Management - Admin
     And the admin clicks the delete button
     Then the category should be deleted successfully
     And success message should be displayed
-
-#  //----pramesh
 
   Scenario: TC_CAT_ADM_11 - Open Add Category page
     And the admin is on the Categories page
@@ -88,7 +86,6 @@ Feature: Category Management - Admin
     And the admin clicks the Save button on category page
     Then an error message "Category name is required" should be displayed
     And an error message "Category name must be between 3 and 10 characters" should be displayed
-
 
   Scenario: TC_CAT_ADM_15 - Cancel add category
     And the admin is on the Categories page

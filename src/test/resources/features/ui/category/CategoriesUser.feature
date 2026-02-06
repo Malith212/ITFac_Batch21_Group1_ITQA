@@ -1,5 +1,5 @@
 @ui
-Feature: Category Management - Standard User
+Feature: Category Management User Functionality
 
   Background:
     Given the user is logged into the system
@@ -30,8 +30,6 @@ Feature: Category Management - Standard User
     When the user enters an invalid category name in search field
     And the user clicks the search button on category page
     Then "No category found" message should be displayed
-
-#//----prameshh
 
   @SeedCategorySortTest
   Scenario: TC_CAT_USR_11 - View category list as user
