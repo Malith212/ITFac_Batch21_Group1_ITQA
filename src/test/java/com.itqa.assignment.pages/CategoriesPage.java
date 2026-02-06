@@ -6,9 +6,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.Select;
-import java.util.Collections;
-
-
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -24,38 +21,41 @@ public class CategoriesPage {
     // ------------------------
     // --- MENU LOCATORS ---
     // ------------------------
-    private final By categoriesMenuItem = By.xpath("/html/body/div[1]/div/div[1]/a[2]"); // Admin left menu "Categories"
+    private final By categoriesMenuItem = By.xpath("//a[contains(@href, '/ui/categories') and contains(@class, 'nav-link')]");
 
     // ------------------------
     // --- PAGE ELEMENTS LOCATORS ---
     // ------------------------
     private final By header = By.xpath("//h3[@class='mb-4']");
-    private final By searchInput = By.xpath("//input[@type='text']");
-    private final By categoryDropdown = By.xpath("//select[@class='form-select']");
-    private final By searchBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/button");
-    private final By resetBtn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/form/div[3]/a[1]");
+    private final By searchInput = By.xpath("//input[@name='name']");
+    private final By categoryDropdown = By.xpath("//select[@name='parentId']");
+    // Replaced absolute paths with relative ones targeting the form's button and reset link
+    private final By searchBtn = By.xpath("//form//button[@type='submit']");
+    private final By resetBtn = By.xpath("//form//a[contains(@href, '/ui/categories') and contains(@class, 'btn-outline-secondary')]");
     private final By addCategoryBtn = By.xpath("//a[@href='/ui/categories/add']");
-    private final By categoryNameInput = By.xpath("//input");
+    private final By categoryNameInput = By.id("name");
     private final By saveCategoryBtn = By.xpath("//button[@type='submit']");
-
     // ------------------------
     // --- TABLE LOCATORS ---
     // ------------------------
-    private final By idColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[1]");
-    private final By nameColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[2]");
-    private final By parentColumn = By.xpath("(//a[@class='text-white text-decoration-none'])[3]");
-    private final By actionsColumn = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[4]");
+    private final By idColumn = By.xpath("//th[contains(., 'ID')]/a");
+    private final By nameColumn = By.xpath("//th[contains(., 'Name')]/a");
+    private final By parentColumn = By.xpath("//th[contains(., 'Parent')]/a");
+    // Targeted the 4th header cell specifically
+    private final By actionsColumn = By.xpath("//table/thead/tr/th[4]");
 
     // --- SORT INDICATORS ---
-    private final By idSortIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[1]/a/span");
-    private final By nameSortIndicator = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/thead/tr/th[2]/a/span");
+    private final By idSortIndicator = By.xpath("//th[contains(., 'ID')]//span");
+    private final By nameSortIndicator = By.xpath("//th[contains(., 'Name')]//span");
 
     // --- TABLE DATA ---
-    private final By allNames = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
-    private final By allIds = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[1]");
-    private final By firstRowId = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr[1]/td[1]");
-    private final By searchResultRecord = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody/tr/td[2]");
+    private final By allNames = By.xpath("//table/tbody/tr/td[2]");
+    private final By allIds = By.xpath("//table/tbody/tr/td[1]");
+    private final By firstRowId = By.xpath("//table/tbody/tr[1]/td[1]");
+    private final By searchResultRecord = By.xpath("//table/tbody/tr/td[2]");
     private final By deleteBtn = By.xpath("//button[@title='Delete']");
+
+    private final By tableBody = By.xpath("//table/tbody");
 
     // ------------------------
     // --- NAVIGATION METHODS ---
@@ -301,8 +301,6 @@ public class CategoriesPage {
         searchButton.click();
         System.out.println("Search button clicked");
 
-        // Wait for the table body to be present (handles empty results for invalid searches)
-        By tableBody = By.xpath("/html/body/div[1]/div/div[2]/div[2]/table/tbody");
         wait.until(ExpectedConditions.presenceOfElementLocated(tableBody));
         System.out.println("Search results loaded");
     }
