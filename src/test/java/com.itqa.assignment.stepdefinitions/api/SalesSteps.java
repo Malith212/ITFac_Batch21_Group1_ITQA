@@ -375,4 +375,35 @@ public class SalesSteps {
                 .delete(fullEndpoint);
         ScenarioContext.setApiResponse(apiResponse);
     }
+
+
+//    PRAMESH
+
+    @Then("the response contains a content array with max {int} items sorted by Sold Date")
+    public void the_response_contains_a_content_array_with_max_items_sorted_by_sold_date(int maxSize) {
+
+        var response = ScenarioContext.getApiResponse();
+        List<Map<String, Object>> content = response.jsonPath().getList("content");
+
+        Assert.assertNotNull("Content array is null", content);
+        Assert.assertTrue("Content array exceeds max size", content.size() <= maxSize);
+
+        // Verify sorting by soldAt date (ascending)
+        if (content.size() > 1) {
+            for (int i = 0; i < content.size() - 1; i++) {
+                String date1 = (String) content.get(i).get("soldAt");
+                String date2 = (String) content.get(i + 1).get("soldAt");
+
+                Assert.assertNotNull("soldAt is null", date1);
+                Assert.assertNotNull("soldAt is null", date2);
+
+                // ISO-8601 strings can be compared lexicographically
+                Assert.assertTrue(
+                        "Sales are not sorted by sold date",
+                        date1.compareTo(date2) <= 0
+                );
+            }
+        }
+    }
+
 }
