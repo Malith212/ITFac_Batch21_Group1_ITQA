@@ -38,3 +38,17 @@ Feature: Category API Validation (User)
     And a valid category ID exists
     When the user sends a DELETE request to delete a category from "/categories/{categoryId}"
     Then the response status code should be 403
+
+#    PRAMESH
+
+  @CleanUpCategory
+  Scenario: TC_CAT_USR_16 - Verify user cannot get category with non-numeric ID
+    Given user auth token is set
+    When the user sends a GET request to get categories from "/categories/abc"
+    Then the response status code should be 400
+
+  @CleanUpCategory
+  Scenario: TC_CAT_USR_17 - Verify user cannot access admin-only category summary
+    Given user auth token is set
+    When the user sends a GET request to get categories from "/categories/summary"
+    Then the response status code should be 403
