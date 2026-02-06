@@ -11,6 +11,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.Assert;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -174,10 +175,9 @@ public class CategorieSteps {
         String actualEndpoint = endpoint.replace("{categoryId}", categoryId);
         Map<String, String> dataMap = dataTable.asMap(String.class, String.class);
 
-        Map<String, Object> categoryBody = Map.of(
-                "id", Integer.parseInt(categoryId),
-                "name", dataMap.get("name")
-        );
+        Map<String, Object> categoryBody = new HashMap<>();
+        categoryBody.put("id", Integer.parseInt(categoryId));
+        categoryBody.put("name", dataMap.get("name"));
         System.out.println("Request Body: " + categoryBody);
 
         Response apiResponse = RestAssured.given()
@@ -312,4 +312,81 @@ public class CategorieSteps {
             Assert.assertTrue("Expected categories to be sorted by id ascending", firstId <= secondId);
         }
     }
+//PRAMESH
+
+    @When("a category already exists with name {string}")
+    public void a_category_already_exists_with_name(String categoryName) {
+
+        Map<String, Object> categoryBody = Map.of(
+                "name", categoryName
+        );
+
+        String id = ApiHelper.postAndGetId(
+                "/categories",
+                categoryBody,
+                ApiHelper.UserRole.ADMIN
+        );
+
+    }
+
+    @When("admin sends POST request to {string} with category name {string} and invalid parent id {int}")
+    public void admin_sends_post_request_with_category_name_and_invalid_parent_id(
+            String endpoint,
+            String categoryName,
+            int invalidParentId
+    ) {
+        Map<String, Object> categoryBody = new HashMap<>();
+        categoryBody.put("name", categoryName);
+
+        // invalid parent reference
+        Map<String, Object> parent = new HashMap<>();
+        parent.put("id", invalidParentId);
+        categoryBody.put("parent", parent);
+
+        System.out.println("Request Body: " + categoryBody);
+
+        Response apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.ADMIN))
+                .contentType("application/json")
+                .body(categoryBody)
+                .when()
+                .post(endpoint);
+
+        System.out.println("Response Status: " + apiResponse.getStatusCode());
+        System.out.println("Response Body: " + apiResponse.getBody().asString());
+
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+    @When("admin sends POST request to {string} with category name {string}")
+    public void admin_sends_post_request_with_category_name(
+            String endpoint,
+            String categoryName
+    ) {
+        Map<String, Object> categoryBody = new HashMap<>();
+        categoryBody.put("name", categoryName);
+
+        System.out.println("Request Body: " + categoryBody);
+
+        Response apiResponse = RestAssured.given()
+                .baseUri(ConfigReader.getProperty("api.base.uri"))
+                .header("Authorization", "Bearer " + ApiHelper.getJwtToken(ApiHelper.UserRole.ADMIN))
+                .contentType("application/json")
+                .body(categoryBody)
+                .when()
+                .post(endpoint);
+
+        System.out.println("Response Status: " + apiResponse.getStatusCode());
+        System.out.println("Response Body: " + apiResponse.getBody().asString());
+
+        ScenarioContext.setApiResponse(apiResponse);
+    }
+
+
+
+
+
+
+
 }
